@@ -34,11 +34,23 @@ class Tree:
             gini -= prob**2
         return gini
 
-    def __split(self, X_current, y_current):
+    def split(self, X_current, y_current, current_constraints = []):
         """Define the split on the currently evaluated space, and the recursively for all the subspaces"""
+        X_current = np.array(X_current)
+        y_current = np.array(y_current)
+       
+        output = []
 
-        if len(y_current) < self.min_samples:
-            return 
+        # Stop if the lenfth reaches 2 or if we only have the same class in the split
+        _,unq = np.unique(y_current, return_counts=True)
+   
+        if len(y_current) < self.min_samples or len(unq) == 1:
+
+            clss,cls_cnts = np.unique(y_current, return_counts=True)
+            cls = clss[cls_cnts.argmax()]
+            
+            current_constraints.append(cls)
+            return current_constraints
 
         # Initialize stuff
         lowest_cost = -1
@@ -59,33 +71,48 @@ class Tree:
 
                 # Calculate the cost
                 cost = len(y_split1)/len(y_current) * self.__gini(y_preds_split1) + len(y_split2)/len(y_current) * self.__gini(y_preds_split2)
+   
                 
                 # Update the cost, and the best split if lower that lowes_cost
-                if lowest_cost == -1 or cost < lowest_cost:
+                if lowest_cost == -1 or cost <= lowest_cost:
                     lowest_cost = cost
                     # Update the split feature and the split treshold
                     split_feature = i
                     split_treshold = x_at_y
-        
+
+    
+
+
         # Define the splits made by the optimal feature and treshold combo
-        X_new_1 = [xi for xi in X_current[split_feature < split_treshold, :]]
-        y_new_1 = [yi for yi in y_current[split_feature < split_treshold]]
-        X_new_2 = [xi for xi in X_current[split_feature >= split_treshold, :]]
-        y_new_2 = [yi for yi in y_current[split_feature >= split_treshold]]
+        X_new_1 = X_current[X_current.T[split_feature] < split_treshold, :]
+        y_new_1 = [yi for yi in y_current[X_current.T[split_feature] < split_treshold]]
 
-        # Return the found out split feature and treshold and recursively repeat for the splits
-        return (split_feature, split_treshold), self.__split(X_current=X_new_1,y_current=y_new_1), self.__split(X_current=X_new_2,y_current=y_new_2) 
+        X_new_2 = X_current[X_current.T[split_feature] >= split_treshold, :]
+        y_new_2 = [yi for yi in y_current[X_current.T[split_feature] >= split_treshold]]
 
+        # False mean y_current X_current.T[split_feature] < split_treshold
+        current_constraints_1 = current_constraints.copy()
+        current_constraints_1.append((split_feature, split_treshold, False))
 
+        current_constraints_2 = current_constraints.copy()
+        current_constraints_2.append((split_feature, split_treshold, True))
 
+   
+
+        output.extend(self.split(X_current=X_new_1,y_current=y_new_1, current_constraints=current_constraints_1))
+        output.extend(self.split(X_current=X_new_2,y_current=y_new_2, current_constraints=current_constraints_2))
+   
+        # Recuresively, the True and False are used to convey the direction of the inequlity (False means split_feature < split_treshold)
+        return output
+    
     def build(self, X, y):
-        """Builds the TreeModel from the inputed data"""
-        X = np.array(X)
-        y = np.array(y)
+            """Builds the TreeModel from the inputed data"""
+            X = np.array(X)
+            y = np.array(y)
 
-        split_features_and_splits = self.__split(X,y)
+            split_features_and_splits = self.split(X,y)
 
-        return TreeModel(split_features_and_splits)  # return an object that can do prediction
+            return TreeModel(split_features_and_splits)  # return an object that can do prediction
 
 
 class TreeModel:
@@ -93,35 +120,66 @@ class TreeModel:
     def __init__(self, split_features_and_splits):
         self.split_features_and_splits = split_features_and_splits
 
-    def __find_closest_tresholds(self, x_row, split_features, split_treshs):
-        """Finds the closest thresholds to locate the area that x_row is in, in the space"""
-        # the output features and treshs
-        split_features_closest = []
-        split_treshs_closest = []
-        for i, xi in enumerate(x_row):
-            # Find the constraints on current feature
-            current_smallest_diff = -1
-            current_split_features_indices = split_features[split_features == i]
-            # If the feature doesnt have a treshold
-            if len(current_split_features_indices) == 0:
-                break
-            # Check differences with all 
-            for j in current_split_features_indices:
-                diff = xi - split_treshs[j]
-                if diff < current_smallest_diff or current_smallest_diff == -1:
-                    current_smallest_diff = diff
-            split_features_closest
-        
-            
-
     def predict(self, X):
-        y_preds = np.ones(len(X)) 
+        y_preds = []
+        bol = True
+        # Go through all the rows
         for x_row in X:
-            for (split_feature, split_tresh) in self.split_features_and_splits:
-                y_pred = 1 if x_row[split_feature] > split_tresh else 0
-                y_preds[i] = 
-            
-        return   
+            # Thorugh the array of specified splits and split classes
+            for el in self.split_features_and_splits:
+
+                # if this split was abandoned and we came to the end of it
+                if (el ==1 or el == 0) and bol == False:
+                    bol = True
+                    continue
+
+                # If we came to the end of the split sequence add as prediction
+                if el ==1 or el == 0 and bol:
+                    y_preds.append(el)
+                    break
+
+                # If one of the decisions isn't correct than it isn't the correct split sequence
+                if el[2] != (x_row[el[0]] >= el[1]):
+                    bol = False
+
+        return y_preds
+
+
+import unittest
+
+class MyTests(unittest.TestCase):
+    def test_tree(self):
+        X = np.array([[1,2,31,2],
+              [3,122,1,7],
+              [43,2,5,5],
+              [4,5,3,555],
+              [32,3,23,2]])
+
+        y = [1,0,1, 1,0]
+        tree = Tree()
+        self.assertListEqual(tree.build(X,y).predict(X), y)
+
+
+
+
+def hw_tree_full(learn, test):
+    # Split the data
+    X_learn, y_learn = learn
+    X_test, y_test = test
+
+    # Initizalize the model
+    tree = Tree(min_samples=2)
+    # build the model
+    tree_model = tree.build(X_learn, y_learn)
+    # Inference
+    y_pred = tree_model.predict(X_test)
+    # Calculate missclassification rate
+    missclass = sum(abs(y_pred - y_test)) / len(y_test)
+
+    # Standard error
+    SE = np.sqrt(missclass * (1- missclass)/len(y_test))
+
+    return (missclass, SE)
 
 
 # class RandomForest:
@@ -172,5 +230,12 @@ def tki():
 if __name__ == "__main__":
     learn, test, legend = tki()
 
-    print("full", hw_tree_full(learn, test))
-    #print("random forests", hw_randomforests(learn, test))
+    misclass, SE = hw_tree_full(learn, test)
+    print(f"missclassification: {misclass} +/- {SE}")
+    #("random forests", hw_randomforests(learn, test))
+
+
+
+
+
+
