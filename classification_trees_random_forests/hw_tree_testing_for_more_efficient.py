@@ -4,6 +4,9 @@ import random
 import unittest
 import matplotlib.pyplot as plt
 
+#TODO IMPLEMENT WITH A TREE STRUCTURE
+
+
 def read_tab(fn, adict):
     content = list(csv.reader(open(fn, "rt"), delimiter="\t"))
 
@@ -316,8 +319,8 @@ def missclass_rates_for_number_of_trees(learn, test, n_start, n_stop):
     return missclassifications_train, missclassifications_test
     
 def plot_missclass_vs_num_of_trees(missclass_test, missclass_train,n_start, n_stop):
-    plt.plot(range(n_start, n_stop+1), missclass_train, label = "Train missclassification")
-    plt.plot(range(n_start, n_stop+1), missclass_test, label = "Test missclassification")
+    plt.plot(range(n_start, n_stop), missclass_train, label = "Train missclassification")
+    plt.plot(range(n_start, n_stop), missclass_test, label = "Test missclassification")
     plt.ylabel("Missclassification rate")
     plt.xlabel("Number of trees")
     plt.legend()
@@ -342,7 +345,7 @@ if __name__ == "__main__":
     # Plot missclassification vs number of trees
     n_start,n_stop = 1,100
     missclassifications_train, missclassifications_test = missclass_rates_for_number_of_trees(learn, test,n_start, n_stop)
-    plot_missclass_vs_num_of_trees(missclassifications_test, missclassifications_train,n_start, n_stop)
+    plot_missclass_vs_num_of_trees(missclassifications_test, missclassifications_test,n_start, n_stop)
 
 
 
