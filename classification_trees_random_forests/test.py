@@ -126,9 +126,9 @@ class Tree:
 
                 # Calculate the cost by summing both ginis and weighting them 
                 cost = len(y_split1)/len(y_current) * self.__gini(y_preds_split1) + len(y_split2)/len(y_current) * self.__gini(y_preds_split2)
-              
+                print(cost, i)
                 # Update the cost, and the best split if lower that lowes_cost
-                if lowest_cost == -1 or cost <= lowest_cost:
+                if lowest_cost == -1 or cost < lowest_cost:
                     lowest_cost = cost
                     # Update the split feature and the split treshold
                     split_feature = i
@@ -141,7 +141,7 @@ class Tree:
         X_new_2 = X_current[X_current.T[split_feature] >= split_treshold, :]
         y_new_2 = [yi for yi in y_current[X_current.T[split_feature] >= split_treshold]]
 
-
+        print(X_new_1, X_new_2)
 
         # False mean y_current X_current.T[split_feature] < split_treshold
         current_constraints_1 = current_constraints.copy()
@@ -170,7 +170,6 @@ class Tree:
             split_features_and_splits = self.split(X,y, cols)
 
             return TreeModel(split_features_and_splits)  # Return a tree that can do prediction
-
 
 class TreeModel:
 
@@ -201,173 +200,15 @@ class TreeModel:
 
         return y_preds
 
-
-class RandomForest:
-
-    def __init__(self, rand=None, n=100):
-        self.n = n # Number of trees
-        self.rand : random.Random = rand # Random generator
-        # Use only the sqrt(n) number of features
-        self.rftree = Tree(min_samples=2, rand=rand, get_candidate_columns=random_sqrt_columns) 
-
-    def __get_bs_sample(self, X,y):
-        """Gets one bootstrap sample from X and y"""
-        X = np.array(X)
-        # Randomly sample rows with replacement
-        rows = self.rand.sample(range(len(y)), len(y))
-        X_sample = X[rows, :] 
-        y_sample = y[rows]
-        return X_sample, y_sample
-
-    def build(self, X, y):
-        
-        # Trees together = forest
-        forest = []
-        for i in range(self.n):
-            # Get bootstrap sample
-            X_sample, y_sample = self.__get_bs_sample(X, y)
-            # Build the tree
-            tree_model = self.rftree.build(X_sample, y_sample)
-            # Append tree to the forest
-            forest.append(tree_model)
-
-        return RFModel(forest, X, y)  # Return the prediction model, with all the built trees
-
-
-class RFModel:
-
-    def __init__(self, forest, X, y):
-        self.forest = forest
-        self.X = X
-        self.y = y
-
-    def predict(self, X):
-
-        # Use majority vote for prediction
-        predictions = []
-        
-        # Sum up the prediction of all trees
-        summation_of_predictions = np.zeros(shape=len(X))
-        for tree in self.forest:
-            summation_of_predictions += tree.predict(X)
-            
-        # Get the majority vote by normalizing with the length
-        summation_of_predictions /= len(self.forest)
-        predictions = np.round(summation_of_predictions)
-
-        return predictions
-
-    def importance(self):
-        imps = np.zeros(self.X.shape[1])
-        
-        return imps
-
-
-
-def hw_tree_full(learn, test):
-    """Test the full tree model"""
-    # Split the data
-    X_learn, y_learn = learn
-    X_test, y_test = test
-
-    # Initizalize the model 
-    tree = Tree(min_samples=2, rand=random.Random(42))
-    # build the model
-    tree_model = tree.build(X_learn, y_learn)
-    # Inference
-    y_pred_train = tree_model.predict(X_learn)
-    y_pred = tree_model.predict(X_test)
-
-    # Calculate train misclass, and standard error
-    missclass_train = sum(abs(y_pred_train - y_learn)) / len(y_learn)
-    SE_train = np.sqrt(missclass_train * (1- missclass_train)/len(y_learn))
-
-    # Calculate test misclass, and standard error
-    missclass = sum(abs(y_pred - y_test)) / len(y_test)
-    SE = np.sqrt(missclass * (1- missclass)/len(y_test))
-
-    return (missclass_train, SE_train,missclass, SE)
-
-
-def hw_randomforests(learn, test, n = 100):
-    """Test the random forest model"""
-    # Split the data
-    X_learn, y_learn = learn
-    X_test, y_test = test
-
-    # Initialize the model
-    rf = RandomForest(rand=random.Random(42),n = n)
-
-    rf_model = rf.build(X_learn, y_learn)
-    # Inference
-    y_pred_train = rf_model.predict(X_learn)
-    y_pred = rf_model.predict(X_test)
-
-    # Calculate train misclass, and standard error
-    missclass_train = sum(abs(y_pred_train - y_learn)) / len(y_learn)
-    SE_train = np.sqrt(missclass_train * (1- missclass_train)/len(y_learn))
-
-    # Calculate test misclass, and standard error
-    missclass = sum(abs(y_pred - y_test)) / len(y_test)
-    SE = np.sqrt(missclass * (1- missclass)/len(y_test))
-
-    return (missclass_train, SE_train, missclass, SE)
-
-def missclass_rates_for_number_of_trees(learn, test, n_start, n_stop):
-    """Test the random forest for different numbers of trees"""
-    # Try all different numbers of trees
-    missclassifications_test = []
-    missclassifications_train = []
-    for n in range(n_start, n_stop+1):
-        print(n)
-        missclass_train,_, missclass_test, _ = hw_randomforests(learn,test,n)
-        missclassifications_test.append(missclass_test)
-        missclassifications_train.append(missclass_train)
-
-    return missclassifications_train, missclassifications_test
-    
-def plot_missclass_vs_num_of_trees(missclass_test, missclass_train,n_start, n_stop):
-    plt.plot(range(n_start, n_stop), missclass_train, label = "Train missclassification")
-    plt.plot(range(n_start, n_stop), missclass_test, label = "Test missclassification")
-    plt.ylabel("Missclassification rate")
-    plt.xlabel("Number of trees")
-    plt.legend()
-    plt.show()
-
     
 
-
-if __name__ == "__main__":
-    learn, test, legend = tki()
-
-    # # Test the full tree
-    misclass_train, SE_train,misclass, SE = hw_tree_full(learn, test)
-    print(f"Tree train set missclassification: {misclass_train} +/- {SE_train}") 
-    print(f"Tree test set missclassification: {misclass} +/- {SE}")
-
-    # Test the random forest
-    # misclass_train, SE_train,misclass, SE=hw_randomforests(learn, test)
-    # print(f"Random forest train set missclassification: {misclass_train} +/- {SE_train}") 
-    # print(f"Random forest test set missclassification: {misclass} +/- {SE}")
-
-    # Plot missclassification vs number of trees
-    # n_start,n_stop = 1,100
-    # missclassifications_train, missclassifications_test = missclass_rates_for_number_of_trees(learn, test,n_start, n_stop)
-    # plot_missclass_vs_num_of_trees(missclassifications_test, missclassifications_test,n_start, n_stop)
+tree = Tree(random.Random(2))
+X = [[4,0,10],
+     [4,1,10],
+     [4,9,10]]
 
 
-
-
-class MyTests(unittest.TestCase):
-    # vprašanje: Kakšne teste
-    def test_tree(self):
-        X = np.array([[1,2,31,2],
-              [3,122,1,7],
-              [43,2,5,5],
-              [4,5,3,555],
-              [32,3,23,2]])
-
-        y = [1,0,1, 1,0]
-        tree = Tree()
-        self.assertListEqual(tree.build(X,y).predict(X), y)
-
+y= [1,0,1]
+tree_model = tree.build(X, y)
+print(tree_model.split_features_and_splits)
+print(tree_model.predict(X))
