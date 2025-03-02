@@ -160,13 +160,12 @@ class Tree:
                     cnt1l +=1
 
 
-                # Update the cost, and the best split if lower that lowes_cost
+                # Update the cost, and the best split if lower that lowes_cost (if the same take the first instance of that cost)
                 if lowest_cost == -1 or cost < lowest_cost:
                     lowest_cost = cost
                     # Update the split feature and the split treshold
                     split_feature = i
                     split_treshold = x_at_y
-
 
         # Define the splits made by the optimal feature and treshold combo
         X_new_1 = X_current[X_current.T[split_feature] < split_treshold, :]
@@ -175,10 +174,8 @@ class Tree:
         X_new_2 = X_current[X_current.T[split_feature] >= split_treshold, :]
         y_new_2 = [yi for yi in y_current[X_current.T[split_feature] >= split_treshold]]
 
-        print(X_new_1, X_new_2, split_treshold, split_feature)
 
         if len(y_new_1) == 0 or len(y_new_2) == 0:
-            print("here")
             values, counts = np.unique(y_current, return_counts=True)
             most_frequent = values[np.argmax(counts)]
             return [most_frequent]
@@ -207,6 +204,10 @@ class TreeModel:
 
     def __init__(self, split_features_and_splits):
         self.split_features_and_splits = split_features_and_splits
+        # For feature importance calculation
+        # Feature index (key) and a list of lists that indicate the position of a feature (value)
+        # 0 means left, 1 means right
+        self.feature_positions = {}
 
 
     def __get_pred(self, row, current_list):
@@ -216,33 +217,39 @@ class TreeModel:
         
         l1 = current_list[0]
         tup1 = l1[0]
-        if tup1[2] == (row[tup1[0]] >= tup1[1]):
-            return self.__get_pred( row, l1[1])
-        
+
         l2 = current_list[1]
-        tup2 = l2[0]
-        if tup2[2] == (row[tup2[0]] >= tup2[1]):
-            return self.__get_pred( row, l2[1])
+
+        # For updating positions(variable importance)
+        if tup1[2] == (row[tup1[0]] >= tup1[1]):
+            
+            return self.__get_pred( row, l1[1])
+
+
+        return self.__get_pred( row, l2[1])
             
 
-    def predict(self, X):
+    def predict(self, X, get_positions = False):
         y_preds = []
         # Go through all the rows
 
         for x_row in X:
-            y_preds.append(self.__get_pred(x_row, self.split_features_and_splits))
+            y_preds.append(self.__get_pred(x_row, self.split_features_and_splits, get_positions=get_positions))
 
         return np.array(y_preds)
 
-
 tree = Tree(random.Random(2))
-X = np.array([[1,2,31,2],
-        [3,122,1,7],
-        [43,2,5,5],
-        [4,5,3,555],
-        [32,3,23,2]])
+X = np.array([[1,10,31,2],
+        [1,0,1,7],
+        [2,0,5,5],
+        [1,10,3,555],
+        [3,0,23,2],
+        [7,0,2,4]])
 
-y = np.array([1,0,1, 1,0])
+y = np.array([1,0,1, 1,0,1])
 tree_model = tree.build(X, y)
 #print(tree_model.split_features_and_splits)
-print(tree_model.predict(X))
+print(tree_model.predict(X, True))
+
+print(tree_model.feature_positions)
+print(tree_model.split_features_and_splits)
