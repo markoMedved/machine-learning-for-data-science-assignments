@@ -5,10 +5,6 @@ import unittest
 import matplotlib.pyplot as plt
 from timeit import default_timer as timer
 
-
-#TODO look at the notes
-# TODO make tests
-
 def read_tab(fn, adict):
     content = list(csv.reader(open(fn, "rt"), delimiter="\t"))
 
@@ -20,16 +16,13 @@ def read_tab(fn, adict):
 
     return legend, X, y
 
-
 def tki():
     legend, Xt, yt = read_tab("tki-train.tab", {"Bcr-abl": 1, "Wild type": 0})
     _, Xv, yv = read_tab("tki-test.tab", {"Bcr-abl": 1, "Wild type": 0})
     return (Xt, yt), (Xv, yv), legend
 
-
 def all_columns(X, rand):
     return range(X.shape[1])
-
 
 def random_sqrt_columns(X, rand: random.Random):
     # Get number of all columns
@@ -49,6 +42,7 @@ class Tree:
         self.rand = rand  # for replicability
         self.get_candidate_columns = get_candidate_columns  # needed for random forests
         self.min_samples = min_samples # minimal number of samples where the node is still split further
+        self.used_features = set()
 
     def __gini(self, probs):
         """calculates the gini impurity"""
@@ -72,14 +66,12 @@ class Tree:
         
         # if somehow the length is zero assign the zero class (no reason just on of the classes), this shouldn't really happen
         if len(list(y_current)) == 0:
-            print("empty y")
-            #print(current_constraints)
             return [0]
 
         # If all the feature vectors are the same, return the majority class
         tmp = False
         for i  in range(1,len(X_current)):     
-            if ((np.array_equal(X_current[i],X_current[i-1])) and y_current[i] != y_current[i-1] ):
+            if ((np.array_equal(X_current[i],X_current[i-1])) and y_current[i] != y_current[i-1]):
                 tmp = True
             else:
                 tmp = False
@@ -130,6 +122,7 @@ class Tree:
                 # Calculate the current treshold to look at
                 x_at_y = (x[j] + x[j+1])/2
 
+                # Continue if the next feature is the same since the cost will not be accurate in this case
                 if j > 0 and x[j] == x[j+1]:
                     if y == 0:
                         cnt0r -= 1
@@ -139,26 +132,24 @@ class Tree:
                         cnt1l +=1
                     continue
 
-
                 # The probabilities first split of the space
                 prob1l = 1/2 if (cnt1l + cnt0l)==0 else cnt1l/ (cnt1l + cnt0l)
                 prob0l = 1 - prob1l
 
-                # The 
+                # Second space
                 prob1r =1/2 if (cnt1r + cnt0r) == 0 else cnt1r /(cnt1r + cnt0r)
                 prob0r = 1 - prob1r
 
                 # Calculate the cost by summing both ginis and weighting them 
                 cost = (cnt0r+cnt1r)/length_y * self.__gini([prob0r, prob1r]) + (cnt0l + cnt1l)/length_y * self.__gini([prob0l, prob1l])
 
-               
+                # Update the counters according to the label value that just passed through
                 if y == 0:
                     cnt0r -= 1
                     cnt0l +=1
                 else:
                     cnt1r -= 1
                     cnt1l +=1
-
 
                 # Update the cost, and the best split if lower that lowes_cost (if the same take the first instance of that cost)
                 if lowest_cost == -1 or cost < lowest_cost:
@@ -167,17 +158,17 @@ class Tree:
                     split_feature = i
                     split_treshold = x_at_y
 
+        self.used_features.add(split_feature)
 
         # Define the splits made by the optimal feature and treshold combo
-        X_new_1 = X_current[X_current.T[split_feature] < split_treshold, :]
+        X_new_1 = X_current[X_current.T[split_feature] <= split_treshold, :]
         y_new_1 = [yi for yi in y_current[X_current.T[split_feature] < split_treshold]]
 
-        X_new_2 = X_current[X_current.T[split_feature] >= split_treshold, :]
-        y_new_2 = [yi for yi in y_current[X_current.T[split_feature] >= split_treshold]]
+        X_new_2 = X_current[X_current.T[split_feature] > split_treshold, :]
+        y_new_2 = [yi for yi in y_current[X_current.T[split_feature] > split_treshold]]
 
-
+        # If a split was left empty, a value should be returned instead of causing an infinite loop
         if len(y_new_1) == 0 or len(y_new_2) == 0:
-            print("here")
             values, counts = np.unique(y_current, return_counts=True)
             most_frequent = values[np.argmax(counts)]
             return [most_frequent]
@@ -185,6 +176,7 @@ class Tree:
 
         # Recuresively extend the output with the conditions
         # The True and False are used to convey the direction of the inequlity (False means split_feature < split_treshold)
+        # The output is in the form of nested looops
         output.append([(split_feature, split_treshold, False),self.split(X_current=X_new_1,y_current=y_new_1)])
         output.append([(split_feature, split_treshold, True),self.split(X_current=X_new_2,y_current=y_new_2)])
    
@@ -198,77 +190,43 @@ class Tree:
             # Calculate the splits (split feature, split treshold, </>=), and classes for each split
             split_features_and_splits = self.split(X,y)
 
-            return TreeModel(split_features_and_splits)  # Return a tree that can do prediction
+            return TreeModel(split_features_and_splits, self.used_features)  # Return a tree that can do prediction
 
 
-    
 class TreeModel:
 
-    def __init__(self, split_features_and_splits):
+    def __init__(self, split_features_and_splits, used_features):
         self.split_features_and_splits = split_features_and_splits
-        # For feature importance calculation
-        # Feature index (key) and a list of lists that indicate the position of a feature (value)
-        # 0 means left, 1 means right
-        self.feature_positions = {}
+        self.used_features = used_features # For faster importance
 
-
-    def __get_pred(self, row, current_list, pos=[0], row_path = [], get_positions = False):
-
-        if get_positions:
-            if len(current_list) == 1:
-                return current_list[0], row_path
-
+    def __get_pred(self, row, current_list):
+        """Calculate the prediction for one row of the data"""
+        
+        # If the current list of constraints is of length 1 that means that just the predicted class remained
         if len(current_list) == 1:
             return current_list[0]
         
+        # Seperate into 2 lists for each child node
         l1 = current_list[0]
+        l2 = current_list[1]
+        # This is the tuple with the (split feature, split treshold, </>=)
         tup1 = l1[0]
 
-        l2 = current_list[1]
+        # tup1[2] is True or false (< or >=), tup1[0] = selected feature, tup1[1] = the treshold
+        # Chose the correct next node
+        if tup1[2] == (row[tup1[0]] > tup1[1]):
 
-        # For updating positions(variable importance)
-        if get_positions:
-            if tup1[0] in self.feature_positions:
+            return self.__get_pred(row, l1[1])
     
-                if  not (pos in self.feature_positions[tup1[0]]):
-    
-                    self.feature_positions[tup1[0]].append(pos.copy())
-            else:
-
-                self.feature_positions[tup1[0]] = [pos.copy()]
-
-        pos1 = pos.copy()
-        if tup1[2] == (row[tup1[0]] >= tup1[1]):
+        return self.__get_pred( row, l2[1])
             
-            if get_positions:
-                pos1.append(0)
-                row_path.append(0)
-
-
-            return self.__get_pred( row, l1[1], pos=pos1.copy(), get_positions=get_positions, row_path=row_path)
-        
-        pos2 = pos.copy()
-        if get_positions:
-            pos2.append(1)
-            row_path.append(1)
-
-        return self.__get_pred( row, l2[1],pos = pos2.copy(), get_positions=get_positions, row_path=row_path)
-            
-
-    def predict(self, X, get_positions = False):
+    def predict(self, X):
         y_preds = []
-        row_paths = []
         # Go through all the rows
-
         for x_row in X:
-            if get_positions:
-                y_pred, row_path = y_preds.append(self.__get_pred(x_row, self.split_features_and_splits, get_positions=get_positions))
-                y_preds.append(y_pred)
-                row_paths.append(row_path)
-            else:
-                y_preds.append(self.__get_pred(x_row, self.split_features_and_splits, get_positions=get_positions))
+            y_preds.append(self.__get_pred(x_row, self.split_features_and_splits))
 
-        return np.array(y_preds)#, row_paths if get_positions else np.array(y_preds) 
+        return np.array(y_preds)
 
 
 class RandomForest:
@@ -282,36 +240,42 @@ class RandomForest:
     def __get_bs_sample(self, X,y):
         """Gets one bootstrap sample from X and y"""
         X = np.array(X)
+        all_rows = range(len(y))
         # Randomly sample rows with replacement
-        rows = self.rand.sample(range(len(y)), len(y))
+        rows = self.rand.choices(all_rows, k=len(y))
+        oob_rows = list(set(all_rows) - set(rows))
+
         X_sample = X[rows, :] 
         y_sample = y[rows]
-        return X_sample, y_sample
+        return X_sample, y_sample, oob_rows
 
     def build(self, X, y):
         
         # Trees together = forest
         forest = []
+        oob_rows_for_each_tree = []
         for i in range(self.n):
             # Get bootstrap sample
-            X_sample, y_sample = self.__get_bs_sample(X, y)
+            X_sample, y_sample, oob_rows = self.__get_bs_sample(X, y)
+            oob_rows_for_each_tree.append(oob_rows)
             # Build the tree
             tree_model = self.rftree.build(X_sample, y_sample)
             # Append tree to the forest
             forest.append(tree_model)
 
-        return RFModel(forest, X, y)  # Return the prediction model, with all the built trees
+        return RFModel(forest, X, y, oob_rows_for_each_tree, self.rand)  # Return the prediction model, with all the built trees
 
 
 class RFModel:
 
-    def __init__(self, forest, X, y):
+    def __init__(self, forest, X, y, oob_rows_for_each_tree, rand):
         self.forest = forest
         self.X = X
         self.y = y
+        self.oob_rows_for_each_tree = oob_rows_for_each_tree # out of the bag indices for all trees
+        self.rand = rand # Random generator
 
     def predict(self, X):
-        start = timer()
 
         # Use majority vote for prediction
         predictions = []
@@ -324,51 +288,144 @@ class RFModel:
         # Get the majority vote by normalizing with the length
         summation_of_predictions /= len(self.forest)
         predictions = np.round(summation_of_predictions)
-        end = timer()
-        print(f"RF inference time: {end - start}")
-
         return predictions
     
 
+    def get_first_split_feature(self, X_current, y_current):
+        # Same algorith as when building tree, however only return the first feature
+
+        # Go through all the features
+        length_y = len(y_current)
+        # Initialize stuff
+        lowest_cost = -1
+        split_feature = 0
+
+        for i,x in enumerate(np.transpose(X_current)):
+           
+            # Initialize counters for the left and right split 
+            cnt1l = 0
+            cnt0l =  0
+            
+            cnt1r = np.count_nonzero(y_current)
+            cnt0r = length_y - cnt1r
+
+            # Sort the feature
+            sort_indeces = np.argsort(x)
+            x = x[sort_indeces]
+            y_all = y_current[sort_indeces]
+            
+            # Go through all the data points
+            for j,y in enumerate(y_all[:len(y_all)-1]):
+
+                if j > 0 and x[j] == x[j+1]:
+                    if y == 0:
+                        cnt0r -= 1
+                        cnt0l +=1
+                    else:
+                        cnt1r -= 1
+                        cnt1l +=1
+                    continue
+
+                # The probabilities first split of the space
+                prob1l = 1/2 if (cnt1l + cnt0l)==0 else cnt1l/ (cnt1l + cnt0l)
+                prob0l = 1 - prob1l
+
+                # Second space
+                prob1r =1/2 if (cnt1r + cnt0r) == 0 else cnt1r /(cnt1r + cnt0r)
+                prob0r = 1 - prob1r
+
+                # Calculate the cost by summing both ginis and weighting them 
+                cost = (cnt0r+cnt1r)/length_y * self.__gini([prob0r, prob1r]) + (cnt0l + cnt1l)/length_y * self.__gini([prob0l, prob1l])
+
+                if y == 0:
+                    cnt0r -= 1
+                    cnt0l +=1
+                else:
+                    cnt1r -= 1
+                    cnt1l +=1
+
+                # Update the cost, and the best split if lower that lowes_cost (if the same take the first instance of that cost)
+                if lowest_cost == -1 or cost < lowest_cost:
+                    lowest_cost = cost
+                    # Update the split feature and the split treshold
+                    split_feature = i
+
+        return int(split_feature)
+    
+    def get_bs_sample(self, X,y):
+        """Gets one bootstrap sample from X and y"""
+        # Needed for the root features calculation (Repeat)
+        X = np.array(X)
+        all_rows = range(len(y))
+        # Randomly sample rows with replacement
+        rows = self.rand.choices(all_rows, k=len(y))
+
+        X_sample = X[rows, :] 
+        y_sample = y[rows]
+        return X_sample, y_sample
+    
+    def __gini(self, probs):
+        """calculates the gini impurity"""
+        # Needed for the root features calculation (Repeat)
+        gini = 1
+        for prob in probs:
+            gini -= prob**2
+        return gini
+    
+    def get_100_roots(self, X,y, n = 100):
+        """Get the features that were root features in 100 non-random trees, on bootstraped data"""
+        features = np.zeros(shape=(100))
+        for i in range(n):
+            X_current, y_current = self.get_bs_sample(X,y)
+            features[i] = self.get_first_split_feature(X_current, y_current)
+        # Return unique ones
+        return np.unique(features)
+
 
     def importance(self):
+        """Calculate the importance of features for RF"""
         len_forest = len(self.forest)
-        missclasses_diffs = []
+        # Differences in accuracies between og and shuffled features
+        acc_diffs  = np.zeros(shape=(len(self.X.T)))
 
-        # Get predictions for the normal forest 
-        missclasses_normal = []
-        feature_positions_for_trees = []
-        row_paths_trees = []
-        for tree in self.forest:
-            # Not necesarily 0 since they don't have all features
-            pred = tree.predict(self.X)#, get_positions = True)
-            # Calculate missclass
-            missclass_original = np.sum(np.abs(self.y - pred)) / len(pred)
-            feature_positions_for_trees.append(tree.feature_positions)
-            missclasses_normal.append(missclass_original)
-            #row_paths_trees.append(row_paths)
-
-        
-
-        for i,x_feat in enumerate(self.X.T):
-            #print(i)
-            missclass_current_var_diff = 0
-            # Permute the feature
-            x_row_shuffled = random.shuffle(x_feat)
-            X_shuffled = self.X.T
-            X_shuffled[i] = x_row_shuffled
-            X_shuffled = X_shuffled.T
-
-            for i,tree in enumerate(self.forest):
-
-                # Calculate the missclassification with the permutted feature
-                missclass_shuffled= np.sum(np.abs(self.y - tree.predict(X_shuffled))) / len(pred)
-                missclass_current_var_diff += missclass_shuffled - missclasses_normal[i]
-
-        
-            missclasses_diffs.append(missclass_current_var_diff/len_forest)
+        # Go through the entire forest, also all of the oobs for each tree
+        for j, (tree, x_indeces) in enumerate(zip(self.forest,self.oob_rows_for_each_tree)):
             
-        return missclasses_diffs
+            # Get only the oob data
+            X = self.X[x_indeces]
+            targets = self.y[x_indeces]
+
+            # Predict on the original features
+            pred_og = tree.predict(X)
+            # Calculate acc for the original 
+            acc_original = np.mean(pred_og == targets)
+
+            # Through all of the features
+            for i in range(len(X.T)):
+                # Small optimization
+                if not(i in tree.used_features):
+                    continue
+
+                # Permute the feature
+                X_shuffled = X.T.copy()
+                self.rand.shuffle(X_shuffled[i])
+                X_shuffled = X_shuffled.T
+
+                # Calculate the acc with the permutted feature
+                pred = tree.predict(X_shuffled)
+                acc_shuffled= np.mean(pred == targets)
+
+                # Calculate the difference in accuracy and add to the index for the feature
+                acc_diffs[i] += acc_original -acc_shuffled
+
+        # Normalize with the amount of trees
+        acc_diffs /= len_forest
+        return acc_diffs
+    
+    #def importance3(self):
+
+    
+
 
 def missclass_fn(y, y_pred, bootstrap_m = 200, rand: random.Random = random.Random(42)):
     """Calculate missclassification and quantify uncertainty"""
@@ -390,7 +447,6 @@ def missclass_fn(y, y_pred, bootstrap_m = 200, rand: random.Random = random.Rand
     # Return only the bootstrap standard error
     return missclass, SE_bs
 
-
 def hw_tree_full(learn, test):
     """Test the full tree model"""
     # Split the data
@@ -405,16 +461,13 @@ def hw_tree_full(learn, test):
     y_pred_train = tree_model.predict(X_learn)
     y_pred = tree_model.predict(X_test)
 
-
     # Calculate train misclass, and standard error
     missclass_train, SE_train = missclass_fn(y_learn, y_pred_train)
-
 
     # Calculate test misclass, and standard error
     missclass, SE = missclass_fn(y_test, y_pred)
 
     return (missclass_train, SE_train),(missclass, SE)
-
 
 def hw_randomforests(learn, test, n = 100):
     """Test the random forest model"""
@@ -436,12 +489,26 @@ def hw_randomforests(learn, test, n = 100):
     # Calculate test misclass, and standard error
     missclass, SE = missclass_fn(y_test, y_pred)
 
-    # Variable importance 
-    imp = rf_model.importance()
-    #plt.plot(imp)
-    #plt.show()
-
     return (missclass_train, SE_train),(missclass, SE)
+
+
+
+def importance_test(learn, n = 100):
+    """Try the implemented importance"""
+
+    # Split the data
+    X_learn, y_learn = learn
+
+    # Initialize the model
+    rf = RandomForest(rand=random.Random(42),n = n)
+    rf_model = rf.build(X_learn, y_learn)
+
+    # Calculate the importances
+    imp = rf_model.importance()
+
+    # Calculate the root features for 100 non-random trees
+    root_features = rf_model.get_100_roots(X_learn, y_learn)
+    return np.array(imp), np.array(root_features, dtype=int)
 
 def missclass_rates_for_number_of_trees(learn, test, n_start, n_stop):
     """Test the random forest for different numbers of trees"""
@@ -461,19 +528,66 @@ def missclass_rates_for_number_of_trees(learn, test, n_start, n_stop):
     return np.array(missclassifications_train), np.array(SEs_train), np.array(missclassifications_test), np.array(SEs_test)
     
 def plot_missclass_vs_num_of_trees(missclass_test,SEs_test, missclass_train, SEs_train,n_start, n_stop):
-    """Calculate missclassification for different number of trees"""
+    """Plot missclassification for different number of trees"""
+
     x_axis = range(n_start, n_stop+1)
     plt.plot(x_axis, missclass_train, label = "Train missclassification")
 
     plt.plot(x_axis, missclass_test, label = "Test missclassification")
+    # Also show the uncertainty
     plt.fill_between(x_axis, missclass_test - SEs_test, missclass_test + SEs_test, alpha = 0.3, color = "orange")
+
     plt.ylabel("Missclassification rate")
     plt.xlabel("Number of trees")
     plt.legend()
     plt.show()
 
+
+
+if __name__ == "__main__":
+    learn, test, legend = tki()
+
+    # Test the full tree
+    start_time = timer()
+    (misclass_train, SE_train),(misclass, SE) = hw_tree_full(learn, test)
+    stop_time = timer()
+    print(f"Tree train set missclassification: {misclass_train} +/- {SE_train}") 
+    print(f"Tree test set missclassification: {misclass} +/- {SE}")
+    print(f"it took {stop_time - start_time} seconds")
+
+    # Test the random forest
+    start_time = timer()
+    (misclass_train, SE_train),(misclass, SE)=hw_randomforests(learn, test)
+    stop_time = timer()
+    print(f"Random forest train set missclassification: {misclass_train} +/- {SE_train}") 
+    print(f"Random forest test set missclassification: {misclass} +/- {SE}")
+    print(f"it took {stop_time - start_time} seconds")
+
+    # Plot missclassification vs number of trees
+    # n_start,n_stop = 1,100
+    # missclassifications_train,SEs_train, missclassifications_test,SEs_test = missclass_rates_for_number_of_trees(learn, test,n_start, n_stop)
+    # plot_missclass_vs_num_of_trees(missclassifications_test,SEs_test,  missclassifications_train,SEs_train,n_start, n_stop)
+
+    # Variable importance 
+    start_time = timer()
+    imp, root_features = importance_test(learn, 100)
+    stop_time = timer()
+    print(f"Importance evaluation took: {stop_time- start_time} seconds")
+    # Plot
+    only_root_features = np.zeros(len(imp))
+    only_root_features[root_features] = imp[root_features]
+    plt.bar(range(len(imp)),imp)
+    plt.bar(range(len(imp)),only_root_features)
+    plt.show()
+
+
+    unittest.main()
+
+
+
 def random_feature(X, rand):
     return [rand.choice(list(range(X.shape[1])))]
+
 
 class MyTests(unittest.TestCase):
     # test from the other file
@@ -540,33 +654,3 @@ class MyTests(unittest.TestCase):
         tree_model = tree.build(X,y)
         pred = tree_model.predict(X)
         print(pred, y)
-
-
-
-if __name__ == "__main__":
-    learn, test, legend = tki()
-
-    # Test the full tree
-    start_time = timer()
-    (misclass_train, SE_train),(misclass, SE) = hw_tree_full(learn, test)
-    stop_time = timer()
-    print(f"Tree train set missclassification: {misclass_train} +/- {SE_train}") 
-    print(f"Tree test set missclassification: {misclass} +/- {SE}")
-    print(f"it took {stop_time - start_time} seconds")
-
-    # Test the random forest
-    start_time = timer()
-    (misclass_train, SE_train),(misclass, SE)=hw_randomforests(learn, test)
-    stop_time = timer()
-    print(f"Random forest train set missclassification: {misclass_train} +/- {SE_train}") 
-    print(f"Random forest test set missclassification: {misclass} +/- {SE}")
-    print(f"it took {stop_time - start_time} seconds")
-
-    # Plot missclassification vs number of trees
-    # n_start,n_stop = 1,50
-    # missclassifications_train,SEs_train, missclassifications_test,SEs_test = missclass_rates_for_number_of_trees(learn, test,n_start, n_stop)
-    # plot_missclass_vs_num_of_trees(missclassifications_test,SEs_test,  missclassifications_train,SEs_train,n_start, n_stop)
-
-    #unittest.main()
-
-
