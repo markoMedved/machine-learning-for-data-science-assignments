@@ -57,7 +57,7 @@ class Tree:
             gini -= prob**2
         return gini
 
-    def split(self, X_current, y_current,  current_constraints = []):
+    def split(self, X_current, y_current):
         """Define the split on the currently evaluated space, and the recursively for all the subspaces"""
         # Convert tu numpy array 
         X_current = np.array(X_current)
@@ -74,8 +74,7 @@ class Tree:
         if len(list(y_current)) == 0:
             print("empty y")
             #print(current_constraints)
-            current_constraints.append(0)
-            return current_constraints
+            return [0]
 
         # If all the feature vectors are the same, return the majority class
         tmp = False
@@ -88,8 +87,7 @@ class Tree:
         if tmp:
             values, counts = np.unique(y_current, return_counts=True)
             most_frequent = values[np.argmax(counts)]
-            current_constraints.extend([most_frequent])
-            return current_constraints
+            return [most_frequent]
             
 
         # Stop if the length reaches 2 or if we only have the same class in the split
@@ -99,10 +97,7 @@ class Tree:
             #get the class with the higher count (not necessary in case of full tree)
             clss,cls_cnts = np.unique(y_current, return_counts=True)
             cls = clss[cls_cnts.argmax()]
-            
-            # Append the class to the output
-            current_constraints.append(cls)
-            return current_constraints
+            return [cls]
 
         # Initialize stuff
         lowest_cost = -1
@@ -186,23 +181,13 @@ class Tree:
             print("here")
             values, counts = np.unique(y_current, return_counts=True)
             most_frequent = values[np.argmax(counts)]
-            current_constraints.extend([most_frequent])
-            return current_constraints
+            return [most_frequent]
 
 
-
-        # False mean y_current X_current.T[split_feature] < split_treshold
-        current_constraints_1 = current_constraints.copy()
-        current_constraints_1.append((split_feature, split_treshold, False))
-
-        current_constraints_2 = current_constraints.copy()
-        current_constraints_2.append((split_feature, split_treshold, True))
-
-   
         # Recuresively extend the output with the conditions
         # The True and False are used to convey the direction of the inequlity (False means split_feature < split_treshold)
-        output.extend(self.split(X_current=X_new_1,y_current=y_new_1,current_constraints=current_constraints_1))
-        output.extend(self.split(X_current=X_new_2,y_current=y_new_2, current_constraints=current_constraints_2))
+        output.append([(split_feature, split_treshold, False),self.split(X_current=X_new_1,y_current=y_new_1)])
+        output.append([(split_feature, split_treshold, True),self.split(X_current=X_new_2,y_current=y_new_2)])
    
         return output
     
@@ -217,44 +202,47 @@ class Tree:
             return TreeModel(split_features_and_splits)  # Return a tree that can do prediction
 
 
+    
 class TreeModel:
 
     def __init__(self, split_features_and_splits):
         self.split_features_and_splits = split_features_and_splits
 
+
+    def __get_pred(self, row, current_list):
+
+        if len(current_list) == 1:
+            return current_list[0]
+        
+        l1 = current_list[0]
+        tup1 = l1[0]
+        if tup1[2] == (row[tup1[0]] >= tup1[1]):
+            return self.__get_pred( row, l1[1])
+        
+        l2 = current_list[1]
+        tup2 = l2[0]
+        if tup2[2] == (row[tup2[0]] >= tup2[1]):
+            return self.__get_pred( row, l2[1])
+            
+
     def predict(self, X):
         y_preds = []
-        bol = True
         # Go through all the rows
 
         for x_row in X:
-    
-            # Thorugh the array of specified splits and split classes
-            for el in self.split_features_and_splits:
-
-                # if this split was abandoned and we came to the end of it (TODO optimizee)
-                if (el ==1 or el == 0) and bol == False:
-                    bol = True
-                    continue
-
-                # If we came to the end of the split sequence add as prediction
-                if el ==1 or el == 0 and bol:
-                    y_preds.append(el)
-                    break
-
-                # If one of the decisions isn't correct than it isn't the correct split sequence
-                if el[2] != (x_row[el[0]] >= el[1]):
-                    bol = False
+            y_preds.append(self.__get_pred(x_row, self.split_features_and_splits))
 
         return np.array(y_preds)
 
 
 tree = Tree(random.Random(2))
-X = [[4,0,10],
-     [5,0,10],
-     [5,9,10]]
+X = np.array([[1,2,31,2],
+        [3,122,1,7],
+        [43,2,5,5],
+        [4,5,3,555],
+        [32,3,23,2]])
 
-y= [1,0,1]
+y = np.array([1,0,1, 1,0])
 tree_model = tree.build(X, y)
-print(tree_model.split_features_and_splits)
+#print(tree_model.split_features_and_splits)
 print(tree_model.predict(X))

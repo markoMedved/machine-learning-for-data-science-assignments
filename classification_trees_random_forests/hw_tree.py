@@ -57,7 +57,7 @@ class Tree:
             gini -= prob**2
         return gini
 
-    def split(self, X_current, y_current,  current_constraints = []):
+    def split(self, X_current, y_current):
         """Define the split on the currently evaluated space, and the recursively for all the subspaces"""
         # Convert tu numpy array 
         X_current = np.array(X_current)
@@ -74,8 +74,7 @@ class Tree:
         if len(list(y_current)) == 0:
             print("empty y")
             #print(current_constraints)
-            current_constraints.append(0)
-            return current_constraints
+            return [0]
 
         # If all the feature vectors are the same, return the majority class
         tmp = False
@@ -88,8 +87,7 @@ class Tree:
         if tmp:
             values, counts = np.unique(y_current, return_counts=True)
             most_frequent = values[np.argmax(counts)]
-            current_constraints.extend([most_frequent])
-            return current_constraints
+            return [most_frequent]
             
 
         # Stop if the length reaches 2 or if we only have the same class in the split
@@ -99,10 +97,7 @@ class Tree:
             #get the class with the higher count (not necessary in case of full tree)
             clss,cls_cnts = np.unique(y_current, return_counts=True)
             cls = clss[cls_cnts.argmax()]
-            
-            # Append the class to the output
-            current_constraints.append(cls)
-            return current_constraints
+            return [cls]
 
         # Initialize stuff
         lowest_cost = -1
@@ -134,8 +129,7 @@ class Tree:
             for j,y in enumerate(y_all[:len(y_all)-1]):
                 # Calculate the current treshold to look at
                 x_at_y = (x[j] + x[j+1])/2
-                
-                # If 2 in a row are the same, you can't use this since it doesn't represent the actual splits correctly
+
                 if j > 0 and x[j] == x[j+1]:
                     if y == 0:
                         cnt0r -= 1
@@ -145,18 +139,19 @@ class Tree:
                         cnt1l +=1
                     continue
 
+
                 # The probabilities first split of the space
                 prob1l = 1/2 if (cnt1l + cnt0l)==0 else cnt1l/ (cnt1l + cnt0l)
                 prob0l = 1 - prob1l
 
-                # Second split
+                # The 
                 prob1r =1/2 if (cnt1r + cnt0r) == 0 else cnt1r /(cnt1r + cnt0r)
                 prob0r = 1 - prob1r
 
                 # Calculate the cost by summing both ginis and weighting them 
                 cost = (cnt0r+cnt1r)/length_y * self.__gini([prob0r, prob1r]) + (cnt0l + cnt1l)/length_y * self.__gini([prob0l, prob1l])
 
-                # Add/subtract to counters if the corresponding value was next
+               
                 if y == 0:
                     cnt0r -= 1
                     cnt0l +=1
@@ -165,7 +160,7 @@ class Tree:
                     cnt1l +=1
 
 
-                # Update the cost, and the best split if lower that lowes_cost
+                # Update the cost, and the best split if lower that lowes_cost (if the same take the first instance of that cost)
                 if lowest_cost == -1 or cost < lowest_cost:
                     lowest_cost = cost
                     # Update the split feature and the split treshold
@@ -180,39 +175,20 @@ class Tree:
         X_new_2 = X_current[X_current.T[split_feature] >= split_treshold, :]
         y_new_2 = [yi for yi in y_current[X_current.T[split_feature] >= split_treshold]]
 
-        # if one of the splits is empty just return
+
         if len(y_new_1) == 0 or len(y_new_2) == 0:
+            print("here")
             values, counts = np.unique(y_current, return_counts=True)
             most_frequent = values[np.argmax(counts)]
-            current_constraints.extend([most_frequent])
-            return current_constraints
+            return [most_frequent]
 
 
-
-        # False mean y_current X_current.T[split_feature] < split_treshold
-        current_constraints_1 = current_constraints.copy()
-        current_constraints_1.append((split_feature, split_treshold, False))
-
-        current_constraints_2 = current_constraints.copy()
-        current_constraints_2.append((split_feature, split_treshold, True))
-
-   
         # Recuresively extend the output with the conditions
         # The True and False are used to convey the direction of the inequlity (False means split_feature < split_treshold)
-        output.extend(self.split(X_current=X_new_1,y_current=y_new_1,current_constraints=current_constraints_1))
-        output.extend(self.split(X_current=X_new_2,y_current=y_new_2, current_constraints=current_constraints_2))
+        output.append([(split_feature, split_treshold, False),self.split(X_current=X_new_1,y_current=y_new_1)])
+        output.append([(split_feature, split_treshold, True),self.split(X_current=X_new_2,y_current=y_new_2)])
    
         return output
-    
-    def __seperate_into_lists(self,lst):
-        indices_of_numbers = [i for i,x in enumerate(lst) if isinstance(x, (np.int64,np.float64))]
-        tmp_lst = []
-        previous_j = 0
-        for i,j in enumerate(indices_of_numbers):
-            tmp_lst.append(lst[previous_j:j+1])
-            previous_j = j+1
-
-        return tmp_lst
     
     def build(self, X, y):
             """Builds the TreeModel from the inputed data"""
@@ -222,37 +198,46 @@ class Tree:
             # Calculate the splits (split feature, split treshold, </>=), and classes for each split
             split_features_and_splits = self.split(X,y)
 
-            split_features_and_splits = self.__seperate_into_lists(split_features_and_splits)
-
             return TreeModel(split_features_and_splits)  # Return a tree that can do prediction
 
 
+    
 class TreeModel:
 
     def __init__(self, split_features_and_splits):
         self.split_features_and_splits = split_features_and_splits
+        # For feature importance calculation
+        # Feature index (key) and a list of lists that indicate the position of a feature (value)
+        # 0 means left, 1 means right
+        self.feature_positions = {}
+
+
+    def __get_pred(self, row, current_list, pos=[0]):
+
+        if len(current_list) == 1:
+            return current_list[0]
+        
+        l1 = current_list[0]
+        tup1 = l1[0]
+        if tup1[2] == (row[tup1[0]] >= tup1[1]):
+            
+            pos.append(0)
+            return self.__get_pred( row, l1[1], pos=pos)
+        
+        l2 = current_list[1]
+        tup2 = l2[0]
+        if tup2[2] == (row[tup2[0]] >= tup2[1]):
+
+            pos.append(1)
+            return self.__get_pred( row, l2[1],pos = pos)
+            
 
     def predict(self, X):
         y_preds = []
         # Go through all the rows
 
         for x_row in X:
-            found = False
-            # Thorugh the array of specified splits and split classes
-            for i,row in enumerate(self.split_features_and_splits):
-                for el in row:
-                    # If we came to the end of the split sequence add as prediction
-                    if el ==1 or el == 0:
-                        y_preds.append(el)
-                        found = True
-                        break
-                    
-                    # If one of the decisions isn't correct than it isn't the correct split sequence
-                    if el[2] != (x_row[el[0]] >= el[1]):
-                        break
-
-                if found:
-                    break
+            y_preds.append(self.__get_pred(x_row, self.split_features_and_splits))
 
         return np.array(y_preds)
 
@@ -311,21 +296,34 @@ class RFModel:
         predictions = np.round(summation_of_predictions)
 
         return predictions
+    
+
 
     def importance(self):
         len_forest = len(self.forest)
         missclasses_diffs = []
-        for i,x_row in enumerate(self.X):
+
+        # Get predictions for the normal forest 
+        missclasses_normal = []
+        for tree in self.forest:
+            # Not necesarily 0 since they don't have all features
+            missclass_original,_ = missclass_fn(self.y,tree.predict(self.X))
+            missclasses_normal.append(missclass_original)
+
+
+        for i,x_feat in enumerate(self.X.T):
             print(i)
             missclass_current_var_diff = 0
-            for tree in self.forest:
-                # Permute the feature
-                x_row_shuffled = random.shuffle(x_row)
-                missclass_original,_ = missclass_fn(self.y,tree.predict(self.X))
-                X_shuffled = self.X
-                X_shuffled[i] = x_row_shuffled
+            # Permute the feature
+            x_row_shuffled = random.shuffle(x_feat)
+            X_shuffled = self.X.T
+            X_shuffled[i] = x_row_shuffled
+            X_shuffled = X_shuffled.T
+            for i,tree in enumerate(self.forest):
+
+                # Calculate the missclassification with the permutted feature
                 missclass_shuffled,_ = missclass_fn(self.y, tree.predict(X_shuffled))
-                missclass_current_var_diff += missclass_shuffled - missclass_original
+                missclass_current_var_diff += missclass_shuffled - missclasses_normal[i]
 
             missclasses_diffs.append(missclass_current_var_diff/len_forest)
             
@@ -398,8 +396,9 @@ def hw_randomforests(learn, test, n = 100):
     missclass, SE = missclass_fn(y_test, y_pred)
 
     # Variable importance 
-    #imp = rf_model.importance()
-    #plt.plot(imp)
+    imp = rf_model.importance()
+    plt.plot(imp)
+    plt.show()
 
     return (missclass_train, SE_train),(missclass, SE)
 
