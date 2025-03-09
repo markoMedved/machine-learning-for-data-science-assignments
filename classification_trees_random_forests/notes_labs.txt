@@ -1,0 +1,7 @@
+REPORT
+-who is it for
+-Things that help see wheather the implementation is correct, and what the results are
+-convince (last section) -> describe what the algorithm is - why did you structure it that way - report both variants - show that it is similar
+-make it easy to find - make subtitles with the parts (easily recognizable sections)
+- dont waste time
+- dont write what is already known
