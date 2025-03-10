@@ -459,7 +459,6 @@ class RFModel:
                         # If it doens't exist yet in the dict, add it
                         else:
                             acc_diffs[str(feature_lst)] = (acc_original - acc_shuffled)/ len_forest
-
         return acc_diffs
     
     def get_tree_importances(self, current_list,depth, n_features):
