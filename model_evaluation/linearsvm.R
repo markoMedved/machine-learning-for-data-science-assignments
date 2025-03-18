@@ -4,8 +4,8 @@ library(nnet)
 library(e1071) 
 library(cluster)
 library(ggplot2)
+
 # TODO select k, look again into the hyperparameter selection, other stuff should be correct
-# TODO Determine the appropriate encoding
 # TODO maybe for the training fold optimization it is meant to split the training fold again
 # Vprašanja: a je uredu da je v vsakmu foldu drug parameter, a je pr train fold optimization treba razdelit 
 ########################################################################################################################################
@@ -14,20 +14,28 @@ library(ggplot2)
 
 # Read the csv file to a data frame
 df <- read.csv("dataset.csv", sep=";", header=TRUE)
-# Drop duplicated rows
-df <- distinct(df)
 
 # Convert categorical variables to factors
 df <- df %>%
   mutate(across(c("ShotType", "Competition", "PlayerType", "Transition", "TwoLegged", "Movement"), as.factor))
 
-# # Scale numeric variables
+# Scale numeric variables
 df <- df %>%
   mutate(across(where(is.numeric), scale))
 
+# Drop duplicated rows
+df <- distinct(df)
 # Shuffle df
 df <- df[sample(nrow(df)), ]
 
+# Define the baseline classifier
+baseline_classifier <- function(y){
+  # Take the frequency table and divide it by the number of data points
+  bsln <- data.frame(table(y)/length(y[,1]))
+  # Change to data frame so that it matches the other models
+  bsln <- as.data.frame(t(setNames(bsln$Freq, bsln$ShotType)))
+  return(bsln)
+}
 
 # Bootstrap algorithm
 bootstrap <- function(x, f, m = 500, seed = 42){
@@ -121,6 +129,62 @@ accuracy <- function(pred_distr, targets) {
 }
 
 ########################################################################################################################################
+# BASELINE CLASSIFIER AND LOGISTIC REGRESSION CROSS VALIDATION
+########################################################################################################################################
+
+# TODO think about what kind of k is appropriate
+# k = ?
+k = 5
+target_col <- "ShotType"
+folds <- stratified_sampling(df, k, target_col)
+
+# Store all log_losses for linear regression
+log_losses_log_reg_all <- c()
+log_losses_bsln_all <- c()
+
+# Stores TRUE for correct pred and FALSE for incorrect for all data points
+accs_log_reg_all <- c()
+accs_bsln_all <- c()
+
+for(i in seq_along(folds)){
+  # Select the training and test folds
+  test <- folds[[i]]
+  train <- folds[-i]
+  # Change the train fold into a single dataframe
+  train <- bind_rows(train)
+  
+  # Get the targets
+  targets <- test[target_col]
+  
+  ######## Baseline
+  bsln <- baseline_classifier(train[target_col])
+  
+  # Repeat the distribution fo each target("Prediction")
+  bsln_pred <- bsln[rep(1, nrow(targets)), ]
+  
+  # Get the log loss and accuracy vecs for this fold and append them to the entire vector
+  log_loss_bsln <- log_loss(bsln_pred, targets)
+  log_losses_bsln_all <- c(log_losses_bsln_all, log_loss_bsln)
+  
+  acc_bsln <- accuracy(bsln_pred, targets)
+  accs_bsln_all <- c(accs_bsln_all, acc_bsln)
+  
+  ####### Logistic regression
+  log_reg <- multinom(as.factor(train[[target_col]] ) ~ ., data = train[, colnames(train) != target_col])
+  # Predictions
+  log_reg_pred <- predict(log_reg, test, type="probs")
+  
+  # Get the log loss and accuracy vecs for this fold and append them to the entire vector
+  log_loss_log_reg <- log_loss(log_reg_pred, targets)
+  log_losses_log_reg_all <- c(log_losses_log_reg_all, log_loss_log_reg)
+  
+  acc_log_reg <- accuracy(log_reg_pred, targets)
+  accs_log_reg_all <- c(accs_log_reg_all, acc_log_reg)
+  
+  
+}
+
+########################################################################################################################################
 # TESTING SVM, TUNING COST WITH TRAIN FOLD PERFORMANCE OPTIMIZATION
 ########################################################################################################################################
 
@@ -136,12 +200,12 @@ for(i in seq_along(folds)){
   test <- folds[[i]]
   train <- folds[-i]
   train <- bind_rows(train)
-
+  
   # Get the targets
   targets <- test[target_col]
   # Also get the train targets here, for parameter optimization
   train_targets <- train[target_col]
-
+  
   # Set the best C to the first val
   best_degree <- 2
   # Set the best log-loss really high
@@ -154,11 +218,11 @@ for(i in seq_along(folds)){
                      degree = degree,
                      kernel = "polynomial",
                      probability = TRUE)
-
+    
     # Predict and test on the train set to find the best loss on the training set
     svm_pred <- predict(svm_model, train, probability = TRUE)
     svm_pred <- attr(svm_pred, "probabilities")
-
+    
     # Using log-loss for evaluating as criteria for train-fold performance (strictly proper unlike accuracy)
     log_loss_svm <- as.numeric(log_loss(svm_pred, train_targets, FALSE)[1])
     if(log_loss_svm < best_log_loss){
@@ -173,17 +237,17 @@ for(i in seq_along(folds)){
                    degree = best_degree,
                    kernel = "polynomial",
                    probability = TRUE)
-
+  
   svm_pred <- predict(svm_model, test, probability = TRUE)
   svm_pred <- attr(svm_pred, "probabilities")
-
+  
   acc_svm <- accuracy(svm_pred, targets)
   accs_svm_all <- c(accs_svm_all, acc_svm)
-
-
+  
+  
   log_loss_svm <- log_loss(svm_pred, targets)
   log_losses_svm_all <- c(log_losses_svm_all, log_loss_svm)
-
+  
 }
 
 ########################################################################################################################################
@@ -266,14 +330,132 @@ for(i in seq_along(folds)){
   
 }
 
+
 ########################################################################################################################################
 # RESULTS
 ########################################################################################################################################
-# Eval on the actual test set
 
 # Log losses
+print(bootstrap(log_losses_bsln_all, mean))
+print(bootstrap(log_losses_log_reg_all, mean))
 print(bootstrap(log_losses_svm_all, mean))
 print(bootstrap(log_losses_svm_nested_all, mean))
 
+# Accuracy results 
+print(bootstrap(accs_bsln_all, mean))
+print(bootstrap(accs_log_reg_all, mean))
 print(bootstrap(accs_svm_all, mean))
 print(bootstrap(accs_svm_nested_all, mean))
+
+########################################################################################################################################
+# ERROR DISTANCE DEPENDANCE
+########################################################################################################################################
+
+# Here the baseline classifier will be excluded 
+# Get the entire dataset in the correct order of the folds
+all_data <- bind_rows(folds)
+# Data frame for the scatter plot
+plot_data <- data.frame(
+  distance = all_data$Distance,
+  log_loss = log_losses_log_reg_all,
+  log_loss_svm = log_losses_svm_all,
+  log_loss_svm_nested = log_losses_svm_nested_all
+)
+
+# Reshape data for faceting
+plot_data_long <- plot_data %>%
+  tidyr::pivot_longer(
+    cols = c(log_loss, log_loss_svm, log_loss_svm_nested),
+    names_to = "Model",
+    values_to = "LogLoss"
+  ) %>%
+  mutate(
+    Model = factor(Model, levels = c("log_loss", "log_loss_svm", "log_loss_svm_nested"),
+                   labels = c("Log-loss (LogReg)", "Log-loss (SVM)", "Log-loss (SVM Nested)"))
+  )
+
+# Plot the scatter plot of log loss vs distance,
+ggplot(plot_data_long, aes(x = distance, y = LogLoss, color = Model)) +
+  geom_point(alpha = 0.6, size = 2) +
+  geom_smooth(method = "lm", linetype = "dashed", se = F, color="black") +
+  facet_wrap(~ Model) +
+  
+  scale_color_manual(values = c(
+    "Log-loss (LogReg)" = "#E41A1C",     
+    "Log-loss (SVM)" = "#377EB8",        
+    "Log-loss (SVM Nested)" = "#4DAF4A"  
+  )) +
+  
+  labs(
+    title = "Relationship between Distance and Log-loss",
+    x = "Distance",
+    y = "Log-loss"
+  ) +
+  ylim(0,6)+
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    axis.title = element_text(face = "bold"),
+    strip.text = element_text(face = "bold"),
+    legend.position = "none"#  Turn off the legend (unnecesary)
+  )
+
+## Computing linear dependance - correlation, of distance and log-loss
+cor(all_data$Distance, log_losses_log_reg_all)
+cor(all_data$Distance, log_losses_svm_all)
+cor(all_data$Distance, log_losses_svm_nested_all)
+
+# This trend makes sense because of the distribution of shottypes with higher distance, visualization below
+
+# Create consistent factor levels for both distributions
+all_shot_types <- union(names(table(df$ShotType)), names(table(df[df$Distance > 1.5 * mean(df$Distance), ]$ShotType)))
+
+dist_high <- table(factor(df[df$Distance > 1.5 * mean(df$Distance), ]$ShotType, levels = all_shot_types)) / nrow(df[df$Distance > 1.5 * mean(df$Distance), ])
+dist_all <- table(factor(df$ShotType, levels = all_shot_types)) / nrow(df)
+
+# Create the data frame
+plot_data <- data.frame(
+  ShotType = rep(all_shot_types, 2),
+  Probability = c(as.numeric(dist_high), as.numeric(dist_all)),
+  Group = rep(c("High Distance", "All Data"), each = length(all_shot_types))
+)
+
+# Plot
+ggplot(plot_data, aes(x = ShotType, y = Probability, fill = Group)) +
+  geom_bar(stat = "identity", position = "dodge", width = 0.7) +
+  scale_fill_manual(values = c("High Distance" = "#E41A1C", "All Data" = "#377EB8")) +
+  labs(
+    title = "Comparison of Shot Type Distributions",
+    x = "Shot Type",
+    y = "Probability"
+  ) +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    axis.title = element_text(face = "bold"),
+    legend.title = element_blank()
+  )
+
+
+########################################################################################################################################
+# ESTIMATING PERFORMANCE WITH TRUE DISTRIBUTION
+########################################################################################################################################
+
+# Basically just use weights on and calculate the new log_loss/accuracy
+obs_freq <- table(all_data$Competition) / nrow(all_data)
+true_freq <-  c("NBA" = 0.6, "EURO" = 0.1, "SLO1" = 0.1, "U14" = 0.1, "U16" = 0.1)
+
+# Calculate the weight for each row
+all_data$weight <- true_freq[all_data$Competition] / obs_freq[all_data$Competition]
+
+# Weighted log-losses
+print(bootstrap(log_losses_bsln_all * all_data$weight, mean))
+print(bootstrap(log_losses_log_reg_all * all_data$weight, mean))
+print(bootstrap(log_losses_svm_all * all_data$weight, mean))
+print(bootstrap(log_losses_svm_nested_all * all_data$weight, mean))
+
+# Weighted accuracies
+print(bootstrap(accs_bsln_all * all_data$weight, mean))
+print(bootstrap(accs_log_reg_all * all_data$weight, mean))
+print(bootstrap(accs_svm_all * all_data$weight, mean))
+print(bootstrap(accs_svm_nested_all * all_data$weight, mean))
+
+
