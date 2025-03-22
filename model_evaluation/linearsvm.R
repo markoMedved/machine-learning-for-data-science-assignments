@@ -5,9 +5,17 @@ library(e1071)
 library(cluster)
 library(ggplot2)
 
+# report bias variance tradeoff
+# different parameter in each fold is ok (evaluation of algorithm - so it's ok)
+
 # TODO select k, look again into the hyperparameter selection, other stuff should be correct
-# TODO maybe for the training fold optimization it is meant to split the training fold again
+# TODO why did you choose the model for the report
+
 # Vprašanja: a je uredu da je v vsakmu foldu drug parameter, a je pr train fold optimization treba razdelit 
+
+# explain what kind of k you choose, why did you choose this model
+# leave one out - you go through all the possble models - alternative repetitions of cross validation
+
 ########################################################################################################################################
 # DATA PREPARATION AND GENERAL FUNCTIONS
 ########################################################################################################################################
@@ -19,9 +27,6 @@ df <- read.csv("dataset.csv", sep=";", header=TRUE)
 df <- df %>%
   mutate(across(c("ShotType", "Competition", "PlayerType", "Transition", "TwoLegged", "Movement"), as.factor))
 
-# Scale numeric variables
-df <- df %>%
-  mutate(across(where(is.numeric), scale))
 
 # Drop duplicated rows
 df <- distinct(df)
@@ -42,13 +47,14 @@ bootstrap <- function(x, f, m = 500, seed = 42){
   theta <- c()
   set.seed(seed)
   for(i in 1:m){ 
-    FB <- sample(x, length(x), replace = TRUE)
-    curr <- f(FB)
+    smp <- sample(x, length(x), replace = TRUE)
+    curr <- f(smp)
     theta <- c(theta, curr)
   }
   return (list(ESTIMATE = f(x) , SE = sd(theta)))
   
 }
+
 
 ########################################################################################################################################
 # IMPLEMENTATION OF STRATIFIED SAMPLING INTO FOLDS
@@ -132,9 +138,8 @@ accuracy <- function(pred_distr, targets) {
 # BASELINE CLASSIFIER AND LOGISTIC REGRESSION CROSS VALIDATION
 ########################################################################################################################################
 
-# TODO think about what kind of k is appropriate
-# k = ?
-k = 5
+# Use a 10 fold CV, it should be enough - report - look at the paper
+k = 10
 target_col <- "ShotType"
 folds <- stratified_sampling(df, k, target_col)
 
@@ -189,7 +194,7 @@ for(i in seq_along(folds)){
 ########################################################################################################################################
 
 #Posible Degree of polynomial
-degrees <- c(2,3,4,5,6, 8, 10)
+degrees <- c(2,3,5,7, 10)
 
 # For storing all log losses and accuracies
 log_losses_svm_all <- c()
@@ -217,7 +222,9 @@ for(i in seq_along(folds)){
                      data = train[, colnames(train) != target_col],
                      degree = degree,
                      kernel = "polynomial",
-                     probability = TRUE)
+                     probability = TRUE,
+                     gamma = 0.01,
+                     cost = 1)
     
     # Predict and test on the train set to find the best loss on the training set
     svm_pred <- predict(svm_model, train, probability = TRUE)
@@ -236,7 +243,9 @@ for(i in seq_along(folds)){
                    data = train[, colnames(train) != target_col],
                    degree = best_degree,
                    kernel = "polynomial",
-                   probability = TRUE)
+                   probability = TRUE,
+                   gamma = 0.01,
+                   cost = 1)
   
   svm_pred <- predict(svm_model, test, probability = TRUE)
   svm_pred <- attr(svm_pred, "probabilities")
@@ -268,8 +277,7 @@ for(i in seq_along(folds)){
   # Get the targets
   targets <- test[target_col]
   
-  # TODO decide on the inner k
-  # k = ?
+  # Inner k - slightly smaller
   k_nested = 5
   # Again use stratified sampling to get the inner folds
   folds_nested <- stratified_sampling(train, k_nested, target_col)
@@ -291,8 +299,8 @@ for(i in seq_along(folds)){
                        degree = degrees[j],
                        kernel = "polynomial",
                        probability = TRUE,
-                       gamma = 0.1,
-                       cost = 10)
+                       gamma = 0.01,
+                       cost = 1)
       
       # Test on the nested inner validation split of the data
       svm_pred <- predict(svm_model, test_nested, probability = TRUE)
@@ -314,8 +322,8 @@ for(i in seq_along(folds)){
                    degree = best_degree,
                    kernel = "polynomial",
                    probability = TRUE,
-                   gamma = 0.1,
-                   cost = 10)
+                   gamma = 0.01,
+                   cost = 1)
   
   svm_pred <- predict(svm_model, test, probability = TRUE)
   svm_pred <- attr(svm_pred, "probabilities")
@@ -399,10 +407,25 @@ ggplot(plot_data_long, aes(x = distance, y = LogLoss, color = Model)) +
     legend.position = "none"#  Turn off the legend (unnecesary)
   )
 
+# Bootstrap algorithm
+bootstrap_cor <- function(x, y, m = 500, seed = 42){
+  theta <- c()
+  set.seed(seed)
+  for(i in 1:m){ 
+    index <- sample(length(x), length(x), replace = TRUE)
+    curr <- cor(x[index], y[index])
+    theta <- c(theta, curr)
+  }
+  return (list(ESTIMATE = cor(x,y) , SE = sd(theta)))
+  
+}
+
 ## Computing linear dependance - correlation, of distance and log-loss
-cor(all_data$Distance, log_losses_log_reg_all)
-cor(all_data$Distance, log_losses_svm_all)
-cor(all_data$Distance, log_losses_svm_nested_all)
+print(bootstrap_cor(all_data$Distance, log_losses_log_reg_all))
+print(bootstrap_cor(all_data$Distance, log_losses_svm_all))
+print(bootstrap_cor(all_data$Distance, log_losses_svm_nested_all))
+
+
 
 # This trend makes sense because of the distribution of shottypes with higher distance, visualization below
 

@@ -1,0 +1,148 @@
+########################################################################################################################################
+# ERROR DISTANCE DEPENDANCE
+########################################################################################################################################
+
+# Here the baseline classifier will be excluded, because it's clear that it will perform better 
+# Get the entire dataset in the correct order of the folds
+all_data <- bind_rows(folds)
+# Data frame for the scatter plot
+plot_data <- data.frame(
+  distance = all_data$Distance,
+  log_loss = log_losses_log_reg_all,
+  log_loss_tree = log_losses_tree_all,
+  log_loss_tree_nested = log_losses_tree_nested_all
+)
+
+# Reshape data for faceting
+plot_data_long <- plot_data %>%
+  tidyr::pivot_longer(
+    cols = c(log_loss, log_loss_tree, log_loss_tree_nested),
+    names_to = "Model",
+    values_to = "LogLoss"
+  ) %>%
+  mutate(
+    Model = factor(Model, levels = c("log_loss", "log_loss_tree", "log_loss_tree_nested"),
+                   labels = c("Log-loss (LogReg)", "Log-loss (tree)", "Log-loss (tree Nested)"))
+  )
+
+ggplot(plot_data_long, aes(x = distance, y = LogLoss, color = Model)) +
+  geom_point(alpha = 0.6, size = 2) +
+  geom_smooth(method = "lm", linetype = "dashed", se = FALSE, color = "black") +
+  facet_wrap(~ Model, scales = "free_y") +   # Allow each facet to have its own y-axis scale
+  
+  scale_color_manual(values = c(
+    "Log-loss (LogReg)" = "#E41A1C",     
+    "Log-loss (tree)" = "#377EB8",        
+    "Log-loss (tree Nested)" = "#4DAF4A"  
+  )) +
+  
+  labs(
+    title = "Relationship between Distance and Log-loss",
+    x = "Distance",
+    y = "Log-loss"
+  ) +
+  ylim(0,6)+
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    axis.title = element_text(face = "bold"),
+    strip.text = element_text(face = "bold"),
+    legend.position = "none"  # Turn off the legend
+  )
+
+
+# Bootstrap algorithm
+bootstrap_cor <- function(x, y, m = 500, seed = 42){
+  theta <- c()
+  set.seed(seed)
+  for(i in 1:m){ 
+    index <- sample(length(x), length(x), replace = TRUE)
+    curr <- cor(x[index], y[index])
+    theta <- c(theta, curr)
+  }
+  return (list(ESTIMATE = cor(x,y) , SE = sd(theta)))
+  
+}
+
+## Computing linear dependance - correlation, of distance and log-loss
+print(bootstrap_cor(all_data$Distance, log_losses_log_reg_all))
+print(bootstrap_cor(all_data$Distance, log_losses_tree_all))
+print(bootstrap_cor(all_data$Distance, log_losses_tree_nested_all))
+
+
+
+# This trend makes sense because of the distribution of shot types with higher distance, visualization below
+
+# Create consistent factor levels for both distributions
+all_shot_types <- union(names(table(df$ShotType)), names(table(df[df$Distance > 1.5 * mean(df$Distance), ]$ShotType)))
+
+dist_high <- table(factor(df[df$Distance > 1.5 * mean(df$Distance), ]$ShotType, levels = all_shot_types)) / nrow(df[df$Distance > 1.5 * mean(df$Distance), ])
+dist_all <- table(factor(df$ShotType, levels = all_shot_types)) / nrow(df)
+
+# Create the data frame
+plot_data <- data.frame(
+  ShotType = rep(all_shot_types, 2),
+  Probability = c(as.numeric(dist_high), as.numeric(dist_all)),
+  Group = rep(c("High Distance", "All Data"), each = length(all_shot_types))
+)
+
+# Plot
+ggplot(plot_data, aes(x = ShotType, y = Probability, fill = Group)) +
+  geom_bar(stat = "identity", position = "dodge", width = 0.7) +
+  scale_fill_manual(values = c("High Distance" = "#E41A1C", "All Data" = "#377EB8")) +
+  labs(
+    title = "Comparison of Shot Type Distributions",
+    x = "Shot Type",
+    y = "Probability"
+  ) +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    axis.title = element_text(face = "bold"),
+    legend.title = element_blank()
+  )
+
+
+########################################################################################################################################
+# ESTIMATING PERFORMANCE WITH TRUE DISTRIBUTION
+########################################################################################################################################
+all_data$log_losses_bsln_all <- log_losses_bsln_all
+all_data$log_losses_log_reg_all <- log_losses_log_reg_all
+all_data$log_losses_tree_all <- log_losses_tree_all
+all_data$log_losses_tree_nested_all <- log_losses_tree_nested_all
+all_data$accs_bsln_all <- accs_bsln_all
+all_data$accs_log_reg_all <- accs_log_reg_all
+all_data$accs_tree_all <- accs_tree_all
+all_data$accs_tree_nested_all <- accs_tree_nested_all
+
+
+
+# Implement bootstrap, but repeat differently for each group 
+m_base <- 1000 
+obs_freq <- table(all_data$Competition) / nrow(all_data)
+true_freq <-  c("NBA" = 0.6, "EURO" = 0.1, "SLO1" = 0.1, "U14" = 0.1, "U16" = 0.1)
+
+weights <- true_freq/obs_freq
+probs <- weights/ sum(weights)
+all_data$probs <- probs[all_data$Competition]
+
+
+weighted_bootstrap <- function(x,col, f, m = 1000, seed = 42){
+  theta <- c()
+  set.seed(seed)
+  for(i in 1:m){ 
+    smp <- sample(x[, col], nrow(x), replace = TRUE, prob = x$probs)
+    curr <- f(smp)
+    theta <- c(theta, curr)
+  }
+  return (list(ESTIMATE = f(theta) , SE = sd(theta)))
+}
+
+
+print(weighted_bootstrap(all_data, "log_losses_bsln_all", mean))
+print(weighted_bootstrap(all_data, "log_losses_log_reg_all", mean))
+print(weighted_bootstrap(all_data, "log_losses_tree_all", mean))
+print(weighted_bootstrap(all_data, "log_losses_tree_nested_all", mean))
+
+print(weighted_bootstrap(all_data, "accs_bsln_all", mean))
+print(weighted_bootstrap(all_data, "accs_log_reg_all", mean))
+print(weighted_bootstrap(all_data, "accs_tree_all", mean))
+print(weighted_bootstrap(all_data, "accs_tree_nested_all", mean))
