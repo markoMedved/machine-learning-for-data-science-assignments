@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1742648123.02579 "c:/Users/marko/Desktop/MLDS/machine-learning-for-data-science-assignments/model_evaluation/report/main.tex" "main.pdf" "main" 1742648124.0762 0
+["pdflatex"] 1742658507.89668 "c:/Users/marko/Desktop/MLDS/machine-learning-for-data-science-assignments/model_evaluation/report/main.tex" "main.pdf" "main" 1742658508.95005 0
   "C:/Users/marko/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1742578751 82507 a9eef8696c92627b87e9975edea03b2a ""
   "C:/Users/marko/AppData/Local/MiKTeX/miktex/data/le/pdftex/pdflatex.fmt" 1741285665 24225045 9df87bb9afcf68668f63d57d7a3d7d4c ""
   "C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ec.enc" 1256929440 2375 baa924870cfb487815765f9094cf3728 ""
@@ -154,11 +154,13 @@
   "C:/Users/marko/AppData/Local/Programs/MiKTeX/tex/latex/ucs/utf8x.def" 1700127473 8944 e3433baec74c4b7b278c6b6a547ff9ec ""
   "C:/Users/marko/AppData/Local/Programs/MiKTeX/tex/latex/url/url.sty" 1388490452 12796 8edb7d69a20b857904dd0ea757c14ec9 ""
   "C:/Users/marko/AppData/Local/Programs/MiKTeX/tex/latex/xcolor/xcolor.sty" 1700127522 55487 80a65caedd3722f4c20a14a69e785d8f ""
-  "c:/Users/marko/Desktop/MLDS/machine-learning-for-data-science-assignments/model_evaluation/report/main.tex" 1742648121 5942 ee2cb652db3b46f23fe800ea51b078e5 ""
-  "figures/missclass_num_trees.png" 1741515497 46349 03f6e4ffc64f539dc2e1ff82ebc08086 ""
-  "main.aux" 1742648123 1407 3852b6aa822cfa3bf662dec52b98441f "pdflatex"
-  "main.out" 1742648123 783 60a85a830349364273599b9df7638c74 "pdflatex"
-  "main.tex" 1742648121 5942 ee2cb652db3b46f23fe800ea51b078e5 ""
+  "c:/Users/marko/Desktop/MLDS/machine-learning-for-data-science-assignments/model_evaluation/report/main.tex" 1742658507 10420 264c2883cd8fb581725011d7dd9069ec ""
+  "figures/distance_error.png" 1742653718 41948 1511e6374d00c5e8f7b2b378f2aba414 ""
+  "figures/shot_distr.png" 1742653241 16265 b68628add56a352d886255d2480915ab ""
+  "figures/shot_distr_comp.png" 1742657231 15905 80d71341d90b3be3f81249a8a26a9770 ""
+  "main.aux" 1742658508 2634 b8efbd2df5cb040a0ed362c81ac75cc2 "pdflatex"
+  "main.out" 1742658508 1170 90af707295415b32588936d5e300fbe8 "pdflatex"
+  "main.tex" 1742658507 10420 264c2883cd8fb581725011d7dd9069ec ""
   (generated)
   "main.aux"
   "main.log"

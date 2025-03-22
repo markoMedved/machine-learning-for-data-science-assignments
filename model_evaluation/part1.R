@@ -1,7 +1,6 @@
 # Libraries
 library(dplyr)
 library(nnet)
-library(e1071) 
 library(cluster)
 library(ggplot2)
 library(rpart)
@@ -130,8 +129,7 @@ accuracy <- function(pred_distr, targets) {
 # BASELINE CLASSIFIER AND LOGISTIC REGRESSION CROSS VALIDATION
 ########################################################################################################################################
 
-# TODO think about what kind of k is appropriate
-# k = ?
+
 k = 10
 target_col <- "ShotType"
 folds <- stratified_sampling(df, k, target_col)
