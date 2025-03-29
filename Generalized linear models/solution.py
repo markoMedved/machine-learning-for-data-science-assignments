@@ -5,7 +5,9 @@ import numpy as np
 from scipy.optimize import fmin_l_bfgs_b
 import unittest
 import pandas as pd
+from sklearn.utils import resample
 
+# FOR PART 2, USE THE WHOLE DATASET?
 
 class MultinomialLogReg():
     def log_likelihood(self, beta):
@@ -67,8 +69,6 @@ class MultinomialLogRegInference():
         sum_accross_rows = np.tile(sum_accross_rows, (1,u.shape[1]))
         probs = np.exp(u) / sum_accross_rows
         # return the probs
-   
-   
         return probs
 
 
@@ -190,34 +190,9 @@ class MyTests(unittest.TestCase):
 
 if __name__ == "__main__":
     np.random.seed(42)
-    #unittest.main()
-    df = pd.read_csv("dataset.csv", sep=";")
-    # Encode the data
-    encoder = LabelEncoder()
-    for col in ["ShotType", "Competition", "PlayerType", "Movement"]:
-        df[col] = encoder.fit_transform(df[col])
-    # Split into train and test
-    train, test = train_test_split(df, test_size=0.3, stratify=df["ShotType"])
-    # Get the features and target
-    X_train,y_train  = train.drop(columns=["ShotType"]), train["ShotType"]
-    X_test, y_test = test.drop(columns=["ShotType"]), test["ShotType"]
-    # Scale the data
-    scaler = StandardScaler()
-    train_scaled = scaler.fit(X_train)
-    X_train = scaler.transform(X_train)
-    X_test = scaler.transform(X_test)
-    # build the model
-    model = MultinomialLogReg()
-    model_pred = model.build(X_train, y_train)
-    pred = model_pred.predict(X_test)
-    pred_classes = np.argmax(pred, axis=1)
-    print(classification_report(y_test, pred_classes))
-    # Use the other one
-    model = OrdinalLogReg()
-    model_pred = model.build(X_train, y_train)
-    pred = model_pred.predict(X_test)
-    pred_classes = np.argmax(pred, axis=1)
-    print(classification_report(y_test, pred_classes))
+    unittest.main()
+
+
 
 
     

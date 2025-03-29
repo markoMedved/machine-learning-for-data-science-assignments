@@ -19,9 +19,9 @@ class HW2Tests(unittest.TestCase):
 
     def test_multinomial(self):
         l = MultinomialLogReg()
-        c = l.build(self.train[0], self.train[1])
+        c = l.build(self.X, self.y)
         prob = c.predict(self.test[0])
-        print(prob)
+        #print(prob)
         self.assertEqual(prob.shape, (2, 3))
         self.assertTrue((prob <= 1).all())
         self.assertTrue((prob >= 0).all())
