@@ -8,6 +8,10 @@ import pandas as pd
 from sklearn.utils import resample
 
 # FOR PART 2, USE THE WHOLE DATASET?
+# is bootstraping the data for the beta uncertainty ok?
+# 2.2 how much bettter, is it ok for it to only be better on smaller dataset
+# Do we have to provide reasoning for choosing one reference obj (you can change them when feeding data into model)
+# why q-q plot
 
 class MultinomialLogReg():
     def log_likelihood(self, beta):
@@ -37,6 +41,7 @@ class MultinomialLogReg():
     def build(self, X, y):
         self.X = np.array(X)
         self.y = np.array(y)
+        # Add a column for intercept
         self.X = np.c_[np.ones(self.X.shape[0]), self.X]
         m = len(np.unique(self.y))
         # Initialize Beta, (num of classes - 1) * (Num of feautures)
