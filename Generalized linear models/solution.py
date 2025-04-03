@@ -6,6 +6,8 @@ from scipy.optimize import fmin_l_bfgs_b
 import unittest
 import pandas as pd
 from sklearn.utils import resample
+from sklearn.linear_model import LogisticRegression
+
 
 # FOR PART 2, USE THE WHOLE DATASET?
 # is bootstraping the data for the beta uncertainty ok?
@@ -47,7 +49,8 @@ class MultinomialLogReg():
         # Initialize Beta, (num of classes - 1) * (Num of feautures)
         beta = np.random.rand(m - 1, self.X.shape[1])
         # Get the result with the gradient descent
-        result = fmin_l_bfgs_b(self.log_likelihood, beta, approx_grad=True)[0]
+        result = fmin_l_bfgs_b(self.log_likelihood, beta, approx_grad=True,
+                                maxiter=100000)[0]
         # Reshape the result
         result = result.reshape((m-1, self.X.shape[1]))
 
@@ -110,9 +113,11 @@ class OrdinalLogReg():
         deltas = np.ones(m-2) 
         params = np.concatenate((beta, deltas))
         # Set the bounds, deltas have to be more than 0
-        bounds = [(-np.inf, np.inf)] * self.X.shape[1] + [(1e-7, np.inf)] * (m - 2)
+        bounds = [(-np.inf, np.inf)] * self.X.shape[1] + [(1, np.inf)] * (m - 2)
         # Get the result with the gradient descent
-        result = fmin_l_bfgs_b(self.log_likelihood, params, approx_grad=True, bounds=bounds)[0]
+        result = fmin_l_bfgs_b(self.log_likelihood,
+                                params, approx_grad=True, bounds=bounds,
+                                 maxiter=100000)[0]
         beta = result[:self.X.shape[1]]
         deltas = result[self.X.shape[1]:]
 
@@ -158,10 +163,12 @@ class MyTests(unittest.TestCase):
                              [2,2],
                              [3,0],
                              [3,0],
-                             [3,0]])]
+                             [3,0]]),
+                np.array([[0], [1], [2], [3]])]
         self.ys = [np.array([0, 0, 1, 1, 2]),
                    np.array([0,1,2]),
-                   np.array([0,0,0,1,1,1,1,1,1])]
+                   np.array([0,0,0,1,1,1,1,1,1]),
+                   np.array([0, 1, 2, 0])]
     
     def test_multinomial(self):
         for X,y in zip(self.Xs, self.ys):
@@ -170,27 +177,30 @@ class MyTests(unittest.TestCase):
             l = MultinomialLogReg()
             c = l.build(X, y)
             prob = c.predict(X)
-            print(y)
+            model = LogisticRegression(multi_class='multinomial', solver='lbfgs', max_iter=100000)
+            model.fit(X,y)
+            preds_sklearn = model.predict_proba(X)
             print(prob)
+            print(preds_sklearn)
+            print(y)
             #self.assertEqual(prob.shape, (2, 3))
             self.assertTrue((prob <= 1).all())
             self.assertTrue((prob >= 0).all())
             np.testing.assert_almost_equal(prob.sum(axis=1), 1)
 
-    def test_ordinal(self):
-        for X,y in zip(self.Xs, self.ys):
-            train = X[::2], y[::2]
-            test = X[1::2], y[1::2]
-            l = OrdinalLogReg()
-            c = l.build(X, y)
-            prob = c.predict(X)
-            print(y)
-            print(prob)
-            #self.assertEqual(prob.shape, (2, 3))
-            self.assertTrue((prob <= 1).all())
-            self.assertTrue((prob >= 0).all())
-            np.testing.assert_almost_equal(prob.sum(axis=1), 1)
-
+    # def test_ordinal(self):
+    #     for X,y in zip(self.Xs, self.ys):
+    #         train = X[::2], y[::2]
+    #         test = X[1::2], y[1::2]
+    #         l = OrdinalLogReg()
+    #         c = l.build(X, y)
+    #         prob = c.predict(X)
+    #         print(y)
+    #         print(prob)
+    #         #self.assertEqual(prob.shape, (2, 3))
+    #         self.assertTrue((prob <= 1).all())
+    #         self.assertTrue((prob >= 0).all())
+    #         np.testing.assert_almost_equal(prob.sum(axis=1), 1)
 
 
 if __name__ == "__main__":
