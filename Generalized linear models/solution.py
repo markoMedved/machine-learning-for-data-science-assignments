@@ -8,12 +8,23 @@ import pandas as pd
 from sklearn.utils import resample
 from sklearn.linear_model import LogisticRegression
 
+# ali so featurji korelirani - vrzi ven kakšnega čez 0.7 (na random) 
+# pass - no movement, guard - center
+# če so model neve kateri je bolj pomemben
 
 # FOR PART 2, USE THE WHOLE DATASET?
 # is bootstraping the data for the beta uncertainty ok?
 # 2.2 how much bettter, is it ok for it to only be better on smaller dataset
 # Do we have to provide reasoning for choosing one reference obj (you can change them when feeding data into model)
 # why q-q plot
+
+# Log odds - verjetnost
+# kaj povejo
+# če damo logaritem čečz 
+
+
+
+# TODO more tests, cross validation, better DGP, explanation of betas plot (also look into log-odds), for the last part try to understand the plots 
 
 class MultinomialLogReg():
     def log_likelihood(self, beta):
@@ -99,7 +110,7 @@ class OrdinalLogReg():
         l = 0
         for i in range(len(self.y)):
             j = self.y[i]
-            l -= np.log(logistic_cdf(tresholds[j + 1] - u[i]) - logistic_cdf(tresholds[j] - u[i]))
+            l -= np.log(logistic_cdf(tresholds[j + 1] - u[i]) - logistic_cdf(tresholds[j] - u[i]) + 1e-7)
         return l
 
     def build(self, X, y):
