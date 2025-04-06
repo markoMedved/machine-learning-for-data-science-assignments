@@ -472,7 +472,7 @@ if __name__ == "__main__":
     X_train, y_train = train.drop(columns=["target"]), train["target"]
     X_test, y_test = test.drop(columns=["target"]), test["target"]
 
-    # --- Multinomial ---
+    # Multinomial 
     model = MultinomialLogReg()
     model_pred = model.build(X_train, y_train)
     pred_probs = model_pred.predict(X_test)
@@ -488,7 +488,7 @@ if __name__ == "__main__":
     log_loss_mean_MN = np.mean(per_sample_losses_MN)
     log_loss_se_MN = np.std(per_sample_losses_MN, ddof=1) / np.sqrt(len(y_test))
 
-    # --- Ordinal ---
+    # Ordinal 
     model = OrdinalLogReg()
     model_pred = model.build(X_train, y_train)
     pred_probs_ord = model_pred.predict(X_test)
@@ -504,7 +504,7 @@ if __name__ == "__main__":
     log_loss_mean_ORD = np.mean(per_sample_losses_ORD)
     log_loss_se_ORD = np.std(per_sample_losses_ORD, ddof=1) / np.sqrt(len(y_test))
 
-    # --- Output ---
+    # Output 
     print(f"Multinomial Accuracy: {acc_mean_MN:.3f} ± {acc_se_MN:.3f}")
     print(f"Multinomial Log Loss: {log_loss_mean_MN:.3f} ± {log_loss_se_MN:.3f}")
     print(f"Ordinal Accuracy:     {acc_mean_ORD:.3f} ± {acc_se_ORD:.3f}")
@@ -530,7 +530,7 @@ if __name__ == "__main__":
 
     # Get the basic residuals
     response_residuals = y - preds
-    # Then we need the pearson residuals
+    # Then we need the pearson residuals and then the quantile residuals
     quantile_residuals = response_residuals  / np.std(response_residuals)
     quantile_residuals = sorted(quantile_residuals)
     N = len(quantile_residuals)

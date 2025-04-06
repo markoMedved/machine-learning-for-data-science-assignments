@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.3.6)  5 APR 2025 22:05
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.3.6)  6 APR 2025 12:19
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1087,7 +1087,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 65--69
 
  []
 
-<figures/corr.png, id=28, 1156.32pt x 1011.78pt>
+<figures/corr.png, id=29, 1156.32pt x 1011.78pt>
 File: figures/corr.png Graphic file (type png)
 <use figures/corr.png>
 Package pdftex.def Info: figures/corr.png  used on input line 110.
@@ -1139,75 +1139,92 @@ LaTeX Warning: `h' float specifier changed to `ht'.
 pdfTeX warning (ext4): destination with the same identifier (name{figure.1}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.160 
+l.159 
       {C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathsy.enc}
 pdfTeX warning (ext4): destination with the same identifier (name{table.1}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.160 
+l.159 
        <./figures/corr.png>]
-<figures/betas.png, id=48, 1011.78pt x 867.24pt>
+<figures/betas.png, id=49, 578.16pt x 433.62pt>
 File: figures/betas.png Graphic file (type png)
 <use figures/betas.png>
-Package pdftex.def Info: figures/betas.png  used on input line 164.
-(pdftex.def)             Requested size: 249.48138pt x 213.83205pt.
+Package pdftex.def Info: figures/betas.png  used on input line 163.
+(pdftex.def)             Requested size: 249.48138pt x 187.108pt.
 
-Overfull \hbox (2.56302pt too wide) in paragraph at lines 186--193
+Overfull \hbox (2.56302pt too wide) in paragraph at lines 185--192
  [][] 
  []
 
-<figures/qq.png, id=52, 462.528pt x 346.896pt>
-File: figures/qq.png Graphic file (type png)
-<use figures/qq.png>
-Package pdftex.def Info: figures/qq.png  used on input line 223.
-(pdftex.def)             Requested size: 249.48138pt x 187.11461pt.
-<figures/distr.png, id=53, 722.7pt x 433.62pt>
+<figures/lin_reg.png, id=53, 578.16pt x 433.62pt>
+File: figures/lin_reg.png Graphic file (type png)
+<use figures/lin_reg.png>
+Package pdftex.def Info: figures/lin_reg.png  used on input line 211.
+(pdftex.def)             Requested size: 249.48138pt x 187.108pt.
+<figures/distr.png, id=54, 578.16pt x 433.62pt>
 File: figures/distr.png Graphic file (type png)
 <use figures/distr.png>
-Package pdftex.def Info: figures/distr.png  used on input line 231.
-(pdftex.def)             Requested size: 249.48138pt x 149.68507pt.
+Package pdftex.def Info: figures/distr.png  used on input line 220.
+(pdftex.def)             Requested size: 249.48138pt x 187.108pt.
 [2
 pdfTeX warning (ext4): destination with the same identifier (name{figure.2}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.241 
+l.237 
       {C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-rm.enc}{C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathit.enc}
 pdfTeX warning (ext4): destination with the same identifier (name{table.2}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.241 
+l.237 
       
 pdfTeX warning (ext4): destination with the same identifier (name{figure.3}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.241 
+l.237 
       
 pdfTeX warning (ext4): destination with the same identifier (name{figure.4}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.241 
-       <./figures/betas.png> <./figures/qq.png> <./figures/distr.png>]
-<figures/res_vs_fitted.png, id=69, 578.16pt x 433.62pt>
+l.237 
+       <./figures/betas.png> <./figures/lin_reg.png> <./figures/distr.png>]
+<figures/qq.png, id=70, 578.16pt x 433.62pt>
+File: figures/qq.png Graphic file (type png)
+<use figures/qq.png>
+Package pdftex.def Info: figures/qq.png  used on input line 241.
+(pdftex.def)             Requested size: 249.48138pt x 187.108pt.
+<figures/res_vs_fitted.png, id=72, 578.16pt x 433.62pt>
 File: figures/res_vs_fitted.png Graphic file (type png)
 <use figures/res_vs_fitted.png>
-Package pdftex.def Info: figures/res_vs_fitted.png  used on input line 253.
+Package pdftex.def Info: figures/res_vs_fitted.png  used on input line 263.
 (pdftex.def)             Requested size: 226.79846pt x 170.09697pt.
-<figures/cook.png, id=71, 722.7pt x 578.16pt>
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+<figures/cook.png, id=74, 578.16pt x 433.62pt>
 File: figures/cook.png Graphic file (type png)
 <use figures/cook.png>
-Package pdftex.def Info: figures/cook.png  used on input line 274.
-(pdftex.def)             Requested size: 226.79846pt x 181.43324pt.
+Package pdftex.def Info: figures/cook.png  used on input line 283.
+(pdftex.def)             Requested size: 226.79846pt x 170.09697pt.
+
+Underfull \vbox (badness 5954) has occurred while \output is active []
+
  [3
 pdfTeX warning (ext4): destination with the same identifier (name{figure.5}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.279 \end{document}
+l.288 \end{document}
                     
 pdfTeX warning (ext4): destination with the same identifier (name{figure.6}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.279 \end{document}
-                     <./figures/res_vs_fitted.png> <./figures/cook.png>] (main.aux)
+l.288 \end{document}
+                    
+pdfTeX warning (ext4): destination with the same identifier (name{figure.7}) has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.288 \end{document}
+                     <./figures/qq.png> <./figures/res_vs_fitted.png> <./figures/cook.png>] (main.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-04>
@@ -1216,17 +1233,17 @@ Package rerunfilecheck Info: File `main.out' has not changed.
 (rerunfilecheck)             Checksum: C9AE760C027828718C98018FE3CC463E;1782.
  ) 
 Here is how much of TeX's memory you used:
- 14958 strings out of 474486
- 239916 string characters out of 5743756
- 1951542 words of memory out of 5000000
- 36955 multiletter control sequences out of 15000+600000
+ 14967 strings out of 474486
+ 240113 string characters out of 5743756
+ 1952542 words of memory out of 5000000
+ 36963 multiletter control sequences out of 15000+600000
  728362 words of font info for 130 fonts, out of 8000000 for 9000
  1145 hyphenation exceptions out of 8191
  63i,10n,67p,650b,460s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmbx8.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmcsc10.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi8.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr10.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr17.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr7.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr8.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr9.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmri9.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy8.pfb>
-Output written on main.pdf (3 pages, 527890 bytes).
+Output written on main.pdf (3 pages, 621200 bytes).
 PDF statistics:
- 133 PDF objects out of 1000 (max. 8388607)
- 18 named destinations out of 1000 (max. 500000)
- 79 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 138 PDF objects out of 1000 (max. 8388607)
+ 19 named destinations out of 1000 (max. 500000)
+ 84 words of extra memory for PDF output out of 10000 (max. 10000000)
 

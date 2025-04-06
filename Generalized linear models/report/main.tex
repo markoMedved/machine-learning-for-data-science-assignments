@@ -53,7 +53,7 @@ In this approach, we calculate linear predictors for each class,
 excluding the reference class. Afterward, we apply the softmax function
  to compute the probability for the true class. To optimize the model’s 
  weights, we use the maximum likelihood estimation (MLE) method, leveraging 
- the \textit{fmin\_l\_bfgs\_b} with numerical gradients.
+ the \textit{fmin\_l\_bfgs\_b} optimizer with numerical gradients.
  
 An important aspect of this implementation is the inclusion of an 
 intercept column. This is necessary because, in some cases, all feature 
@@ -76,7 +76,7 @@ During the prediction phase, we apply the softmax function to the
      determine the boundaries between classes.
 
   During the model building phase, we again use the MLE approach, as we did with multinomial 
-  logistic regression, and the same optimizer. However, instead of 
+  logistic regression, and the same optimizer. Instead of 
   explicitly modeling the thresholds, we model the differences between
    the thresholds. To ensure numerical stability, we constrain
     these differences (the deltas) to be greater than 1 during the
@@ -93,7 +93,7 @@ We evaluated both classifiers on the provided dataset to predict
   to avoid multicollinearity. Furthermore, we identified strong correlations
    between certain features. Specifically, the "TwoLegged" and "No Movement"
     features, as well as the player type indicators "Guard" and "Forward,"
-     exhibited high correlation, which we can observe on fiure. As a result, we removed the "TwoLegged" 
+     exhibited high correlation, which we can observe on Figure~\ref{fig:corr}. As a result, we removed the "TwoLegged" 
      and "Forward" features to prevent convergence problems and reduce 
      redundancy.
 
@@ -146,9 +146,8 @@ For instance, the "Movement\_no" coefficient is notably influential. The likelih
    is also true for "dunk" and "hook shot" categories. In contrast, "Movement\_drive" has a clear,
     intuitive impact. For example, a drive is less likely to be associated with an "above head"
      shot but is much more common for "layup" and "other" shots. For the "tip-in", "hook shot", 
-     and "dunk", the likelihood of a drive is relatively similar to the reference class, as these
-      shots typically require less dynamic movement.\\
-The "Distance" feature also shows an interesting pattern: the "tip-in" shot is associated with 
+     and "dunk", the likelihood of a drive is relatively similar to the reference class.\\
+The "Distance" feature also shows an interesting pattern: the "tip-in"(reference) shot is associated with 
 the shortest distances, followed by the "dunk", "layup", and "hook shot". Both "other" and 
 "above head" shots, on the other hand, have higher coefficients, which aligns with their nature 
 (mostly for the above head), as they often occur from farther distances.\\
@@ -161,7 +160,7 @@ baseline log-odds of selecting a particular shot type when all other features ar
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.99\columnwidth]{figures/betas.png}
+    \includegraphics[width=.99\columnwidth]{figures/betas.png}
     \caption{Comparison of relationships of features and different shot types}
     \label{fig:betas}
 \end{figure}
@@ -196,34 +195,24 @@ We tested the DGP using a dataset with 100 training data points and 100
     
 
 \section{Part 3: GLM Diagnostics}
-In this section, we first implemented linear regression under the
- assumption that the residuals follow a normal distribution, using the 
- least squares method. We applied this model to predict the basketball
-  shot distance based on the shot angle.
+In this section, we implemented linear regression under the assumption that the residuals 
+follow a normal distribution, utilizing the least squares method. We applied this model to 
+predict basketball shot distance based on the shot angle. The results of the fitted linear 
+regression can be seen in Figure~\ref{fig:lg}.
 
-As part of our diagnostic checks, we plotted the Q-Q plot
- (Figure~\ref{fig:qq}) to assess whether the assumption of normally
-  distributed residuals holds. In the Q-Q plot, we compare the quantile
-   residuals to the theoretical quantiles of a standard normal distribution.
-    If the residuals were normally distributed, the points would align closely
-     with the reference line. However, as shown in the plot, the residuals
-      deviate significantly from this line, indicating that the normality 
-      assumption is not justified.
+Upon examining the residuals, we observe that their distribution is bi-modal, rather than 
+normal as we initially assumed. This is not entirely surprising, given that the distribution
+ of shot distances, as shown in Figure~\ref{fig:distr}, is also bi-modal. Additionally, the 
+ correlation between shot angle and shot distance is very low (-0.056), which further contributes
+  to the similar distribution of residuals across all data points. 
 
-Notably, the residuals exhibit a bi-modal distribution, which 
-is consistent with the distribution of the shot distances themselves, 
-as shown in Figure~\ref{fig:distr}. This is not suprising since the distance 
-and angle do not have much correlation, so we would have a similar 
-distribution of data at each angle.
-
-
-
-\begin{figure}[h]
+  \begin{figure}[h]
     \centering
-    \includegraphics[width=0.99\columnwidth]{figures/qq.png}
-    \caption{Quantile-quantile plot}
-    \label{fig:qq}
+    \includegraphics[width=0.99\columnwidth]{figures/lin_reg.png}
+    \caption{Linear regression, predicting shot length from shot angle}
+    \label{fig:lg}
 \end{figure}
+
 
 
 \begin{figure}[h]
@@ -234,18 +223,39 @@ distribution of data at each angle.
 \end{figure}
 
 
+As part of our diagnostic checks, we plotted the Q-Q plot
+ (Figure~\ref{fig:qq}) to assess whether the assumption of normally
+  distributed residuals holds. In the Q-Q plot, we compare the quantile
+   residuals (we choose the quantile residuals because they are approximately normally distributed as 
+   long as we choose the correct distribution from the exponential family)
+    to the theoretical quantiles of a standard normal distribution.
+    If the residuals were normally distributed, the points would align closely
+     with the reference line. However, as shown in the plot, the residuals
+      deviate significantly from this line, indicating that the normality 
+      assumption is not justified. Again, we can see the consequences of the 
+      distribution of our residuals being bi-modal.
+
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.99\columnwidth]{figures/qq.png}
+    \caption{Quantile-quantile plot}
+    \label{fig:qq}
+\end{figure}
+
+
 The second plot is the quantile residuals vs fitted values plot. We chose to use quantile
- residuals because they tend to have approximately constant variance, which makes them suitable
-  for assessing homoscedasticity (the assumption of constant variance of residuals). This plot
+ residuals because they tend to have approximately constant variance (if we choose the correct 
+ distribution), which makes them suitable
+  for assessing homoscedasticity. This plot
    helps us verify whether the variance of the residuals changes across the range of fitted values.
 
 In Figure~\ref{fig:res_vs_fitted}, we observe that there is no apparent trend or pattern in the 
 variance of the residuals as the fitted values increase. This suggests that the residuals are 
-homoscedastic.
-
-As observed before, the distribution of the residuals remains bi-modal,
- a characteristic also observed in the original distribution of the basketball
-  shot distances (Figure~\ref{fig:distr}). 
+homoscedastic. Here this would not necessarily mean that we chose the correct distribution. 
+The homoscedasticity comes from the fact that the two variables are not really correlated 
+so we have approximately the same distribution of residuals at every point and consequently 
+the same variance. 
 
 
 \begin{figure}[h]
@@ -268,7 +278,6 @@ In the plot, we observe that none of the points have a particularly high Cook's 
  the model. Therefore, it is safe to assume that the regression results are not being 
  significantly impacted by any single data point.
 
- \newpage
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\columnwidth]{figures/cook.png}
