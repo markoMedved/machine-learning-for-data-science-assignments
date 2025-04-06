@@ -15,11 +15,6 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 
 
-
-
-
-# TODO more tests, explanation of betas plot (also look into log-odds), for the last part try to understand the plots 
-
 class MultinomialLogReg():
     def log_likelihood(self, beta):
         m = len(np.unique(self.y))
@@ -530,28 +525,32 @@ if __name__ == "__main__":
 
     # Get the basic residuals
     response_residuals = y - preds
-    # Then we need the pearson residuals and then the quantile residuals
+    # Then we need the pearson residuals
     quantile_residuals = response_residuals  / np.std(response_residuals)
-    quantile_residuals = sorted(quantile_residuals)
-    N = len(quantile_residuals)
+    quantile_residuals_sorted = sorted(quantile_residuals)
+    N = len(quantile_residuals_sorted)
     probabilites = np.linspace(1/(N), N/(N+1), N)
     quantiles_theory = norm.ppf(probabilites)
-
-    # Plot Q-Q plot
-    plt.scatter(quantiles_theory, quantile_residuals, label="Quantile Residuals",
+    # Step 3: Plot Q-Q plot
+    plt.figure(figsize=(8,6))
+    plt.scatter(quantiles_theory, quantile_residuals_sorted, label="Quantile Residuals",
                 color="white", s=14, edgecolors="k")
     plt.plot(quantiles_theory, quantiles_theory, 'r--', label="y=x(Reference)")
-    plt.ylabel("Sample Quantiles")
-    plt.xlabel("Theoretical quantiles")
-    plt.legend()
+    plt.ylabel("Sample Quantiles", fontsize=16)
+    plt.xlabel("Theoretical quantiles", fontsize=16)
+    plt.legend(fontsize=16)
     #plt.savefig("report/figures/qq.png")
 
-    # Plot residuals vs. fitted values
-    plt.figure(figsize=(8,6))
-    plt.scatter(preds,quantile_residuals, color="white", edgecolors="black", s = 3)
+    # residuals vs fitted values, quantile residuals
+    plt.figure(figsize=(8, 6))
+    sns.regplot(x=preds, y=quantile_residuals, scatter_kws={'color': 'white', 'edgecolors': 'black', 's': 3},
+                line_kws={'color': 'red'}, order=3)  
+    # Add horizontal line at y=0
     plt.axhline(0, color="grey", linestyle="--")
-    plt.xlabel("Fitted values")
-    plt.ylabel("Residuals")
+
+    plt.xlabel("Fitted values", fontsize=16)
+    plt.ylabel("Residuals", fontsize=16)
+    plt.legend(['Residuals','Polynomial trend'], loc='upper left', fontsize=16)
     #plt.savefig("report/figures/res_vs_fitted.png")
 
     # Cooks distance plot

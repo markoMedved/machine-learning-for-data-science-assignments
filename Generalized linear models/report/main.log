@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.3.6)  6 APR 2025 12:19
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.3.6)  6 APR 2025 18:32
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1195,35 +1195,28 @@ Package pdftex.def Info: figures/qq.png  used on input line 241.
 <figures/res_vs_fitted.png, id=72, 578.16pt x 433.62pt>
 File: figures/res_vs_fitted.png Graphic file (type png)
 <use figures/res_vs_fitted.png>
-Package pdftex.def Info: figures/res_vs_fitted.png  used on input line 263.
+Package pdftex.def Info: figures/res_vs_fitted.png  used on input line 261.
 (pdftex.def)             Requested size: 226.79846pt x 170.09697pt.
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
 <figures/cook.png, id=74, 578.16pt x 433.62pt>
 File: figures/cook.png Graphic file (type png)
 <use figures/cook.png>
-Package pdftex.def Info: figures/cook.png  used on input line 283.
+Package pdftex.def Info: figures/cook.png  used on input line 281.
 (pdftex.def)             Requested size: 226.79846pt x 170.09697pt.
-
-Underfull \vbox (badness 5954) has occurred while \output is active []
-
  [3
 pdfTeX warning (ext4): destination with the same identifier (name{figure.5}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.288 \end{document}
+l.286 \end{document}
                     
 pdfTeX warning (ext4): destination with the same identifier (name{figure.6}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.288 \end{document}
+l.286 \end{document}
                     
 pdfTeX warning (ext4): destination with the same identifier (name{figure.7}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.288 \end{document}
+l.286 \end{document}
                      <./figures/qq.png> <./figures/res_vs_fitted.png> <./figures/cook.png>] (main.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
@@ -1241,7 +1234,7 @@ Here is how much of TeX's memory you used:
  1145 hyphenation exceptions out of 8191
  63i,10n,67p,650b,460s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmbx8.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmcsc10.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi8.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr10.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr17.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr7.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr8.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr9.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmri9.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy8.pfb>
-Output written on main.pdf (3 pages, 621200 bytes).
+Output written on main.pdf (3 pages, 616678 bytes).
 PDF statistics:
  138 PDF objects out of 1000 (max. 8388607)
  19 named destinations out of 1000 (max. 500000)

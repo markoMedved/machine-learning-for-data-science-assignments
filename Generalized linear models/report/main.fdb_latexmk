@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1743934791.38877 "c:/Users/marko/Desktop/MLDS/machine-learning-for-data-science-assignments/Generalized linear models/report/main.tex" "main.pdf" "main" 1743934792.85198 0
+["pdflatex"] 1743957168.39964 "c:/Users/marko/Desktop/MLDS/machine-learning-for-data-science-assignments/Generalized linear models/report/main.tex" "main.pdf" "main" 1743957169.95132 0
   "C:/Users/marko/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1742578751 82507 a9eef8696c92627b87e9975edea03b2a ""
   "C:/Users/marko/AppData/Local/MiKTeX/miktex/data/le/pdftex/pdflatex.fmt" 1741285665 24225045 9df87bb9afcf68668f63d57d7a3d7d4c ""
   "C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ec.enc" 1256929440 2375 baa924870cfb487815765f9094cf3728 ""
@@ -152,17 +152,17 @@
   "C:/Users/marko/AppData/Local/Programs/MiKTeX/tex/latex/ucs/utf8x.def" 1700127473 8944 e3433baec74c4b7b278c6b6a547ff9ec ""
   "C:/Users/marko/AppData/Local/Programs/MiKTeX/tex/latex/url/url.sty" 1388490452 12796 8edb7d69a20b857904dd0ea757c14ec9 ""
   "C:/Users/marko/AppData/Local/Programs/MiKTeX/tex/latex/xcolor/xcolor.sty" 1700127522 55487 80a65caedd3722f4c20a14a69e785d8f ""
-  "c:/Users/marko/Desktop/MLDS/machine-learning-for-data-science-assignments/Generalized linear models/report/main.tex" 1743934790 13717 792e149f3ed67ce828c7a832d7837bd5 ""
+  "c:/Users/marko/Desktop/MLDS/machine-learning-for-data-science-assignments/Generalized linear models/report/main.tex" 1743957167 13569 a67e8d03ca2e2855102693723b2e99f1 ""
   "figures/betas.png" 1743934455 57708 23621a88b0c637dc0a26731b60e59dcb ""
-  "figures/cook.png" 1743933554 22207 2b892ed6132473ee1e5877a84856f682 ""
+  "figures/cook.png" 1743955019 22207 2b892ed6132473ee1e5877a84856f682 ""
   "figures/corr.png" 1743933988 186045 684b7a7011322a3f74c151b27d63297a ""
-  "figures/distr.png" 1743933556 32356 2a456c6ca2f1fdeeaa504cbb847cf863 ""
-  "figures/lin_reg.png" 1743933683 93875 88d6828b661f0fa32ae88e50251ef10c ""
-  "figures/qq.png" 1743933632 40254 dd53ffcdc5b3f20596760a2bc2d19d53 ""
-  "figures/res_vs_fitted.png" 1743933524 67268 4ea12240896b4d70d2f00f38cece8bed ""
-  "main.aux" 1743934792 3494 b19b4f529b068b4e2f5f2dabcec8786d "pdflatex"
-  "main.out" 1743934792 1782 c9ae760c027828718c98018fe3cc463e "pdflatex"
-  "main.tex" 1743934790 13717 792e149f3ed67ce828c7a832d7837bd5 ""
+  "figures/distr.png" 1743955021 32356 2a456c6ca2f1fdeeaa504cbb847cf863 ""
+  "figures/lin_reg.png" 1743955358 66345 362150a12e93d922e2d2c4da18ba0d48 ""
+  "figures/qq.png" 1743955361 40254 dd53ffcdc5b3f20596760a2bc2d19d53 ""
+  "figures/res_vs_fitted.png" 1743956030 99449 2d86e704da173d276f73a28d70adacfb ""
+  "main.aux" 1743957169 3494 b19b4f529b068b4e2f5f2dabcec8786d "pdflatex"
+  "main.out" 1743957169 1782 c9ae760c027828718c98018fe3cc463e "pdflatex"
+  "main.tex" 1743957167 13569 a67e8d03ca2e2855102693723b2e99f1 ""
   (generated)
   "main.aux"
   "main.log"

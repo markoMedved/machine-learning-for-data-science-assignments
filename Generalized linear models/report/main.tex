@@ -232,8 +232,8 @@ As part of our diagnostic checks, we plotted the Q-Q plot
     If the residuals were normally distributed, the points would align closely
      with the reference line. However, as shown in the plot, the residuals
       deviate significantly from this line, indicating that the normality 
-      assumption is not justified. Again, we can see the consequences of the 
-      distribution of our residuals being bi-modal.
+      assumption is not justified. Again, from this plot we can see that the disribution 
+      of residuals is bi-modal.
 
 
 \begin{figure}[h]
@@ -250,12 +250,10 @@ The second plot is the quantile residuals vs fitted values plot. We chose to use
   for assessing homoscedasticity. This plot
    helps us verify whether the variance of the residuals changes across the range of fitted values.
 
-In Figure~\ref{fig:res_vs_fitted}, we observe that there is no apparent trend or pattern in the 
-variance of the residuals as the fitted values increase. This suggests that the residuals are 
-homoscedastic. Here this would not necessarily mean that we chose the correct distribution. 
-The homoscedasticity comes from the fact that the two variables are not really correlated 
-so we have approximately the same distribution of residuals at every point and consequently 
-the same variance. 
+In Figure~\ref{fig:res_vs_fitted}, we observe that there is a trend in the residuals by the 
+fitted polynomial regression, which shows that linear regression is not a great choice for 
+this model. We can also see that the scatter doesn't have a particular pattern that would suggest 
+drastically changing variance, so we can assume homoscedasticity. 
 
 
 \begin{figure}[h]
