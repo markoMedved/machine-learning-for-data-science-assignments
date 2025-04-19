@@ -1,6 +1,7 @@
 import numpy as np
 import csv
 
+
 def init_glorot(all_units):
     # Initialize the weights, using glorot initialization
     weights_all_layers = []
@@ -9,57 +10,92 @@ def init_glorot(all_units):
         weights_all_layers.append(
             np.random.normal(loc=0, scale=scale, size=(all_units[i+1], all_units[i]))
         )
-    return weights_all_layers
+    biases_all_layers = [np.zeros(units) for units in all_units[1:]]
+    return weights_all_layers, biases_all_layers
 
 def sigmoid(x):
-    return 1 / (1+ np.exp(-x))
+    return 1 / (1 + np.exp(-x))
 
-def softmax(X, x):
-    return np.exp(x)/np.sum(np.exp(X)) 
+def sigmoid_grad(x):
+    sig = sigmoid(x)
+    return sig * (1 - sig)
 
-def forward_pass(weights_all_layers, X):
-    # TODO probably also gonna need to save the activations, for GD
-    probs = []
-    for current_activations in X.copy():
-        for i, weights in enumerate(weights_all_layers):
-            current_activations = weights @ current_activations
-            current_activations = np.array([sigmoid(x) for x in current_activations])
+def softmax(x):
+    x = x - np.max(x)  # For numerical stability
+    e_x = np.exp(x)
+    return e_x / np.sum(e_x)
 
-        current_activations = [softmax(current_activations, x_k) for x_k in current_activations]
-        probs.append(current_activations)
 
-    return np.array(probs)
+def forward_pass_one_sample(weights_all_layers, biases_all_layers, x):
+    pre_activations = []
+    activations = []
+    current_activations = x.copy()
+    pre_activations.append(current_activations)
+
+    for i, (weights, biases) in enumerate(zip(weights_all_layers, biases_all_layers)):
+        # Linear step
+        current_activations = weights @ current_activations + biases
+        pre_activations.append(current_activations)
+
+        # sigmoid(except in last layer)
+        if i < len(weights_all_layers) -1:
+            current_activations = sigmoid(current_activations)
+            activations.append(current_activations)
+
+    probs = softmax(current_activations)
+
+    return probs, pre_activations, activations
+    
+
 
 
 class ANNClassification:
-    # Units determine the amount of activations in each hidden layer
     def __init__(self, units, lambda_):
         self.units = units
-        
-    def fit(self,X,y, seed = 42):
+
+    def fit(self, X, y, seed = 42, lr = 0.1, epochs = 1, conv_loss = 0.003):
         np.random.seed(seed)
-    
-        # Get classes andd numbers of classes
-        classes = np.unique(y)
-        num_classes = len(classes)
+
+        # Get the number of classes
+        num_classes = len(np.unique(y))
 
         # Add input and output layer units
         self.all_units = [len(X[0])]
         self.all_units.extend(self.units)
         self.all_units.append(num_classes)
 
-        # Initialize the weights, using glorot initialization
-        weights_all_layers = init_glorot(self.all_units)
+        # Initialize the weights 
+        weights_all_layers, biases_all_layers = init_glorot(self.all_units)
 
-        # Forward pass
-        probs = forward_pass(weights_all_layers, X)
-        print(probs)
-        
+        # Forward pass and backprop
+        gradients_weights_total =  [np.zeros_like(weights) for weights in weights_all_layers]
+        gradients_biases_total =  [np.zeros_like(bias) for bias in biases_all_layers]
+        total_loss = 0
 
-        
+        for i, (x, y_i) in enumerate(zip(X,y)):
 
-class ANNClassificationPredict:
-    pass
+            # get the activations 
+            probs, pre_activations, activations = forward_pass_one_sample(weights_all_layers, biases_all_layers, x)
+            loss = -np.log(probs[y_i]) / len(y)
+            total_loss += loss
+
+            # Gradient for log-loss and softmax
+            grad_after_softmax = probs
+            grad_after_softmax[y_i] -= 1
+
+            gradients_weights = [np.zeros_like(weights) for weights in weights_all_layers]
+            gradients_biases =  [np.zeros_like(bias) for bias in biases_all_layers]
+
+            for k in reversed(range(len(weights_all_layers))):
+                
+
+
+
+                
+
+           
+                
+
 
 class ANNRegression:
     # implement me too, please
@@ -92,9 +128,8 @@ def squares():
 
 if __name__ == "__main__":
 
-
     # example NN use
-    fitter = ANNClassification(units=[3,6,4], lambda_=0)
+    fitter = ANNClassification(units=[3,4], lambda_=0)
     X = np.array([
         [1, 2, 3],
         [4, 5, 6],
