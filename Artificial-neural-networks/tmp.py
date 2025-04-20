@@ -1,30 +1,5 @@
 import numpy as np
 import csv
-from torch import nn
-import torch
-from torch import optim
-
-# data reading
-def read_tab(fn, adict):
-    content = list(csv.reader(open(fn, "rt"), delimiter="\t"))
-
-    legend = content[0][1:]
-    data = content[1:]
-
-    X = np.array([d[1:] for d in data], dtype=float)
-    y = np.array([adict[d[0]] for d in data])
-
-    return legend, X, y
-
-
-def doughnut():
-    legend, X, y = read_tab("doughnut.tab", {"C1": 0, "C2": 1})
-    return X, y
-
-
-def squares():
-    legend, X, y = read_tab("squares.tab", {"C1": 0, "C2": 1})
-    return X, y
 
 
 def init_glorot(all_units):
@@ -33,7 +8,7 @@ def init_glorot(all_units):
     for i in range(len(all_units) - 1):
         fan_in = all_units[i]
         fan_out = all_units[i + 1]
-        std = 3* np.sqrt(2 / (fan_in + fan_out))  # Glorot normal
+        std = 5 * np.sqrt(2 / (fan_in + fan_out))  # Glorot normal
         weights = np.random.normal(loc=0, scale=std, size=(fan_out, fan_in))
         weights_all_layers.append(weights)
     biases_all_layers = [np.zeros(units) for units in all_units[1:]]
@@ -51,15 +26,8 @@ def softmax(x):
     e_x = np.exp(x)
     return e_x / np.sum(e_x)
 
-def reLU(x):
-    return np.maximum(0, x)
 
-
-def reLU_grad(x):
-    return (x > 0).astype(float)
-    
-
-def forward_pass_one_sample(weights_all_layers, biases_all_layers, x, activation_functions):
+def forward_pass_one_sample(weights_all_layers, biases_all_layers, x):
     pre_activations = []
     activations = []
     current_activations = x.copy()
@@ -72,18 +40,14 @@ def forward_pass_one_sample(weights_all_layers, biases_all_layers, x, activation
 
         # sigmoid(except in last layer)
         if i < len(weights_all_layers) -1:
-            if activation_functions[i] == "reLU":
-                current_activations = reLU(current_activations)
-            else:
-                current_activations = sigmoid(current_activations)
+            current_activations = sigmoid(current_activations)
             activations.append(current_activations)
-            
 
     probs = softmax(current_activations)
 
     return probs, pre_activations, activations
     
-def backprop(weights_all_layers, biases_all_layers, pre_activations, activations, current_activation_grad, activation_functions):
+def backprop(weights_all_layers, biases_all_layers, pre_activations, activations, current_activation_grad):
     gradients_weights = [np.zeros_like(weights) for weights in weights_all_layers]
     gradients_biases =  [np.zeros_like(bias) for bias in biases_all_layers]
 
@@ -96,25 +60,14 @@ def backprop(weights_all_layers, biases_all_layers, pre_activations, activations
         gradients_biases[k] = current_activation_grad
 
         if k > 0:
-            if activation_functions[k-1] == "reLU":
-                current_activation_grad = (current_activation_grad @ W) * reLU_grad(pre_activations[k])
-            else: 
-                current_activation_grad = (current_activation_grad @ W) * sigmoid_grad(pre_activations[k])
+            current_activation_grad = (current_activation_grad @ W) * sigmoid_grad(pre_activations[k])
 
     return gradients_weights, gradients_biases
 
 class ANNClassification:
-    def __init__(self, units, lambda_, activation_functions = None):
+    def __init__(self, units, lambda_):
         self.units = units
         self.lambda_ = lambda_
-        if activation_functions == None:
-            self.activation_functions = ["sig"] * len(units) 
-        else:
-            self.activation_functions = activation_functions
-            if len(activation_functions) != len(units):
-                print("Lenght of activation functions does not match units length, the activations functions will defalut to sigmoid")
-                self.activation_functions = ["sig"] * len(units) 
-
 
     def fit(self, X, y, seed = 42, lr = 0.1, epochs = 15000, conv_loss = 0.001, get_gradients=False, grad_layer=-1):
         np.random.seed(seed)
@@ -140,7 +93,7 @@ class ANNClassification:
             for i, (x, y_i) in enumerate(zip(X,y)):
 
                 # get the activations 
-                probs, pre_activations, activations = forward_pass_one_sample(weights_all_layers, biases_all_layers, x, self.activation_functions)
+                probs, pre_activations, activations = forward_pass_one_sample(weights_all_layers, biases_all_layers, x)
                 loss = -np.log(probs[y_i]) / N
                 total_loss += loss 
                 acc += ( y_i == int(np.argmax(probs)))/N
@@ -150,7 +103,7 @@ class ANNClassification:
                 grad_after_softmax = probs
                 grad_after_softmax[y_i] -= 1
 
-                gradients_weights, gradients_biases = backprop(weights_all_layers, biases_all_layers, pre_activations, activations, grad_after_softmax, self.activation_functions)
+                gradients_weights, gradients_biases = backprop(weights_all_layers, biases_all_layers, pre_activations, activations, grad_after_softmax)
                 #print(gradients_weights)
                 # Accumulate gradients
                 gradients_weights_total = [arr1 +  arr2  for arr1, arr2 in zip(gradients_weights_total, gradients_weights)]
@@ -164,7 +117,7 @@ class ANNClassification:
                         weights_copy[grad_layer] = WL
                         loss = 0
                         for x, y_i in zip(X, y):
-                            probs = forward_pass_one_sample(weights_copy, biases_all_layers, x, self.activation_functions)[0]
+                            probs = forward_pass_one_sample(weights_copy, biases_all_layers, x)[0]
                             loss += -np.log(probs[y_i])
                         return loss
 
@@ -173,7 +126,7 @@ class ANNClassification:
                         biases_copy[grad_layer] = BL
                         loss = 0
                         for x, y_i in zip(X, y):
-                            probs = forward_pass_one_sample(weights_all_layers, biases_copy, x, self.activation_functions)[0]
+                            probs = forward_pass_one_sample(weights_all_layers, biases_copy, x)[0]
                             loss += -np.log(probs[y_i])
                         return loss
 
@@ -217,24 +170,23 @@ class ANNClassification:
                 print(f"acc: {acc}")
 
             if total_loss < conv_loss:
-                print(f"finished in {epoch} epochs, accurac: {acc}, loss: {total_loss}")
+                print(f"finished in {epoch} epochs")
                 break
             
-        return ANNClassificationPredict(weights_all_layers, biases_all_layers, self.activation_functions)
+        return ANNClassificationPredict(weights_all_layers, biases_all_layers)
                 
 
 class ANNClassificationPredict:
-    def __init__(self, weights, biases, activation_functions):
+    def __init__(self, weights, biases):
         self.weights = weights
         self.biases = biases
-        self.activation_functions = activation_functions
 
     def predict(self, X):
-        return np.array([forward_pass_one_sample(self.weights, self.biases, x, self.activation_functions)[0] for x in X])
+        return np.array([forward_pass_one_sample(self.weights, self.biases, x)[0] for x in X])
     
            
 
-def forward_pass_one_sample_reg(weights_all_layers, biases_all_layers, x, activation_functions):
+def forward_pass_one_sample_reg(weights_all_layers, biases_all_layers, x):
     pre_activations = []
     activations = []
     current_activations = x.copy()
@@ -247,10 +199,7 @@ def forward_pass_one_sample_reg(weights_all_layers, biases_all_layers, x, activa
 
         # sigmoid(except in last layer)
         if i < len(weights_all_layers) -1:
-            if activation_functions[i] == "reLU":
-                current_activations = reLU(current_activations)
-            else:
-                current_activations = sigmoid(current_activations)
+            current_activations = sigmoid(current_activations)
             activations.append(current_activations)
 
 
@@ -258,16 +207,9 @@ def forward_pass_one_sample_reg(weights_all_layers, biases_all_layers, x, activa
 
 
 class ANNRegression:
-    def __init__(self, units, lambda_, activation_functions=None):
+    def __init__(self, units, lambda_):
         self.units = units
         self.lambda_ = lambda_
-        if activation_functions == None:
-            self.activation_functions = ["sig"] * len(units) 
-        else:
-            self.activation_functions = activation_functions
-            if len(activation_functions) != len(units):
-                print("Lenght of activation functions does not match units length, the activations functions will defalut to sigmoid")
-                self.activation_functions = ["sig"] * len(units) 
 
     def fit(self, X, y, seed = 42, lr = 0.1, epochs = 15000, conv_loss = 0.00001):
         np.random.seed(seed)
@@ -290,7 +232,7 @@ class ANNRegression:
             for i, (x, y_i) in enumerate(zip(X,y)):
 
                 # Get the activations
-                pre_activations, activations = forward_pass_one_sample_reg(weights_all_layers, biases_all_layers, x, self.activation_functions)
+                pre_activations, activations = forward_pass_one_sample_reg(weights_all_layers, biases_all_layers, x)
                 # NOTE different loss function
                 loss = 2 * (y_i - pre_activations[-1][0])**2 / N
                 total_loss += loss
@@ -299,7 +241,7 @@ class ANNRegression:
                 grad_loss = 2 * (pre_activations[-1] - y_i) / N 
 
                 # backprop
-                gradients_weights, gradients_biases = backprop(weights_all_layers, biases_all_layers, pre_activations, activations, grad_loss, self.activation_functions)
+                gradients_weights, gradients_biases = backprop(weights_all_layers, biases_all_layers, pre_activations, activations, grad_loss)
 
                 # Accumulate gradients
                 gradients_weights_total = [arr1 +  arr2  for arr1, arr2 in zip(gradients_weights_total, gradients_weights)]
@@ -313,18 +255,17 @@ class ANNRegression:
                 print(f"loss: {total_loss}, epoch: {epoch}")
 
             if total_loss < conv_loss:
-                print(f"finished in {epoch} epochs, loss: {total_loss} ")
+                print(f"finished in {epoch} epochs")
                 break
 
-        return ANNRegressionPredict(weights_all_layers, biases_all_layers, self.activation_functions)
+        return ANNRegressionPredict(weights_all_layers, biases_all_layers)
     
     
 
 class ANNRegressionPredict():
-    def __init__(self, weigths, biases, activation_functions):
+    def __init__(self, weigths, biases):
         self.weights_list = weigths
         self.biases = biases
-        self.activation_functions = activation_functions
 
     def weights(self):
         all_weights = []
@@ -338,41 +279,37 @@ class ANNRegressionPredict():
 
 
     def predict(self, X):
-        return np.array([forward_pass_one_sample_reg(self.weights_list, self.biases, x, self.activation_functions)[0][-1][0] for x in X])
+        return np.array([forward_pass_one_sample_reg(self.weights_list, self.biases, x)[0][-1][0] for x in X])
 
 
+# data reading
 
-# Use pytorch
-class ANNPytorch(nn.Module):
-    def __init__(self, input_dim, output_dim, units, activations, lambda_):
-        super().__init__()
+def read_tab(fn, adict):
+    content = list(csv.reader(open(fn, "rt"), delimiter="\t"))
 
-        self.lambda_ = lambda_
+    legend = content[0][1:]
+    data = content[1:]
 
-        layers = []
-        prev_dim = input_dim
+    X = np.array([d[1:] for d in data], dtype=float)
+    y = np.array([adict[d[0]] for d in data])
 
-        for i, (unit, activation) in enumerate(zip(units, activations)):
-            layers.append(nn.Linear(prev_dim, unit))
-            if activation == "reLU":
-                layers.append(nn.ReLU())
-            else:
-                layers.append(nn.Sigmoid())
+    return legend, X, y
 
-            prev_dim = unit
 
-        # Output layer (no activation here; apply softmax in forward)
-        layers.append(nn.Linear(prev_dim, output_dim))
+def doughnut():
+    legend, X, y = read_tab("doughnut.tab", {"C1": 0, "C2": 1})
+    return X, y
 
-        self.model = nn.Sequential(*layers)
 
-    def forward(self, x):
-        return self.model(x)  
+def squares():
+    legend, X, y = read_tab("squares.tab", {"C1": 0, "C2": 1})
+    return X, y
 
 
 if __name__ == "__main__":
+
     # # example NN use
-    # fitter = ANNClassification(units=[3,4], lambda_=0, activation_functions=["reLU", "reLU"])
+    # fitter = ANNClassification(units=[3,4], lambda_=0)
     # X = np.array([
     #     [1, 2, 3],
     #     [4, 5, 6],
@@ -398,42 +335,16 @@ if __name__ == "__main__":
     # print(gradients[grad_layer]- num_gradients)
     # print(bias_gradients[grad_layer] - num_bias_gradients)
 
-    # # doughnut
-    # X,y = doughnut()
-    # fitter = ANNClassification(units=[5], lambda_=0)
-    # model = fitter.fit(X, y, lr=0.001, seed=100, epochs=10000, conv_loss=0.02)
-    # predictions = model.predict(X)
+    # doughnut
+    X,y = doughnut()
+    fitter = ANNClassification(units=[5,5], lambda_=0)
+    model = fitter.fit(X, y, lr=0.001, seed=100, epochs=10000, conv_loss=0.02)
+    predictions = model.predict(X)
+    print(predictions)
 
     # squares
     X,y = squares()
-    fitter = ANNClassification(units=[5], lambda_=0.01)
-    model = fitter.fit(X, y, lr=0.01, seed=100, epochs=3000, conv_loss=0.02)
+    fitter = ANNClassification(units=[10,15, 6], lambda_=0)
+    model = fitter.fit(X, y, lr=0.001, seed=100, epochs=10000, conv_loss=0.02)
     predictions = model.predict(X)
-
-    # TRY squares with pytorch
-    X = torch.tensor(X, dtype=torch.float32)
-    y = torch.tensor(y, dtype=torch.long) 
-    model = ANNPytorch(input_dim=X.shape[1],
-                        output_dim=len(np.unique(y)), units=[5], 
-                        activations=["sig", "sig"], lambda_=0.0)
-    criterion = nn.CrossEntropyLoss()
-    optimizer = optim.SGD(model.parameters(), lr=1, weight_decay=model.lambda_)
-
-    epochs = 3000
-    torch.manual_seed(2)
-    for epoch in range(epochs):
-        model.train()
-
-        logits = model(X)
-        loss = criterion(logits, y)
-
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-
-        if epoch % 100 == 0:
-            pred = torch.argmax(logits, dim=1)
-            acc = (pred == y).float().mean()
-            print(f"Epoch {epoch} | Loss: {loss.item():.4f} | Acc: {acc:.4f}")
-
-
+    print(predictions)
