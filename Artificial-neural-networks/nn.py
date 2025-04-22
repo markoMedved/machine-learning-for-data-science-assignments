@@ -35,7 +35,7 @@ def init_glorot(all_units):
         fan_in = all_units[i]
         fan_out = all_units[i + 1]
         # NOTE: here we multiply by 3, since otherwise it couldnt completly fit the squares, doughnut
-        std = 20* np.sqrt(2 / (fan_in + fan_out))  # Glorot normal
+        std = 5* np.sqrt(2 / (fan_in + fan_out))  # Glorot normal
         weights = np.random.normal(loc=0, scale=std, size=(fan_out, fan_in))
         weights_all_layers.append(weights)
     biases_all_layers = [np.zeros(units) for units in all_units[1:]]
@@ -353,17 +353,17 @@ class ANNRegressionPredict():
 
 
 if __name__ == "__main__":
-    # # example NN use
-    # fitter = ANNClassification(units=[3,4], lambda_=0, activation_functions=["reLU"])
-    # X_ex = np.array([
-    #     [1, 2, 3],
-    #     [4, 5, 6],
-    #     [7, 8, 9]
-    # ], dtype=float)
-    # y_ex = np.array([0, 1, 2])
-    # model = fitter.fit(X_ex, y_ex, lr=0.1, epochs=10000)
-    # predictions = model.predict(X_ex)
-    # print(predictions)
+    # example NN use
+    fitter = ANNClassification(units=[3,4], lambda_=0, activation_functions=[])
+    X_ex = np.array([
+        [1, 2, 3],
+        [4, 5, 6],
+        [7, 8, 9]
+    ], dtype=float)
+    y_ex = np.array([0, 1, 2])
+    model = fitter.fit(X_ex, y_ex, lr=0.1, epochs=10000)
+    predictions = model.predict(X_ex)
+    print(predictions)
     
 
     # # Checking gradients

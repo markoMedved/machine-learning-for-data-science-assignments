@@ -64,14 +64,14 @@ class NNTests(unittest.TestCase):
     #     self.assertEqual(pred.shape, (4,))
     #     np.testing.assert_allclose(pred, 0.5, atol=0.01)
 
-    # def test_ann_regression_hidden_layer_hard(self):
-    #     # one hidden layer
-    #     fitter = ANNRegression(units=[10], lambda_=0., activation_functions=["reLU"])
-    #     m = fitter.fit(self.X, self.hard_y)
-    #     pred = m.predict(self.X)
-    #     print(pred)
-    #     self.assertEqual(pred.shape, (4,))
-    #     np.testing.assert_allclose(pred, self.hard_y, atol=0.01)
+    def test_ann_regression_hidden_layer_hard(self):
+        # one hidden layer
+        fitter = ANNRegression(units=[10], lambda_=0., activation_functions=[])
+        m = fitter.fit(self.X, self.hard_y)
+        pred = m.predict(self.X)
+        print(pred)
+        self.assertEqual(pred.shape, (4,))
+        np.testing.assert_allclose(pred, self.hard_y, atol=0.01)
 
     def test_ann_regression_hidden_layers_hard(self):
         # two hidden layers

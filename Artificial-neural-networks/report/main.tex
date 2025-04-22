@@ -53,6 +53,11 @@ We implemented a fully connected neural network with an arbitrary number of laye
   for the input and output layers. Since the task involves multi-class classification,
    we used the softmax function on the output layer (applied to the logits).
 
+   To initialize the weights we used the Xavier(Glorot) normal initialization: 
+   \[
+    W \sim \mathcal{N}\left(0, \, c \cdot \frac{2}{n_\text{in} + n_\text{out}}\right)
+   \]
+
 To train the network, we used an approach where gradients are computed 
 separately for each training example and then accumulated. We used the 
 cross-entropy loss (log loss) as the criterion. After computing the loss,
@@ -99,7 +104,11 @@ To validate our implementation of backpropagation, we added the option to return
 the numerical gradients and the gradients computed through backpropagation at a chosen
  layer. Our comparison procedure involved computing the gradients for all samples in the 
  dataset (using the provided squares, doughnut, and example datasets), and then comparing 
- the results.
+ the results. To compute the numerical gradients we used the defition of the derivative:
+ \[
+ \frac{d}{dx} f(x) = \lim_{h \to 0} \frac{f(x+h) - f(x - h)}{2h}
+ \]
+and approximated it using $h=0.0001$.
 
 We used a network with six hidden layers, each with a different number of 
 activations. We then checked the differences between the
