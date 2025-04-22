@@ -35,7 +35,7 @@ def init_glorot(all_units):
         fan_in = all_units[i]
         fan_out = all_units[i + 1]
         # NOTE: here we multiply by 3, since otherwise it couldnt completly fit the squares, doughnut
-        std = 5* np.sqrt(2 / (fan_in + fan_out))  # Glorot normal
+        std = 20* np.sqrt(2 / (fan_in + fan_out))  # Glorot normal
         weights = np.random.normal(loc=0, scale=std, size=(fan_out, fan_in))
         weights_all_layers.append(weights)
     biases_all_layers = [np.zeros(units) for units in all_units[1:]]
@@ -118,7 +118,7 @@ class ANNClassification:
                 self.activation_functions = ["sig"] * len(units) 
 
 
-    def fit(self, X, y, seed = 42, lr = 1, epochs = 50000, conv_loss = 0.001, get_gradients=False, grad_layer=-1, return_loss=False, verbose=True):
+    def fit(self, X, y, seed = 42, lr = 0.3, epochs = 50000, conv_loss = 0.001, get_gradients=False, grad_layer=-1, return_loss=False, verbose=True):
         np.random.seed(seed)
 
         # Get the number of classes, and length of data
@@ -144,7 +144,7 @@ class ANNClassification:
 
                 # get the activations 
                 probs, pre_activations, activations = forward_pass_one_sample(weights_all_layers, biases_all_layers, x, self.activation_functions)
-                loss = -np.log(probs[y_i]) / N
+                loss = -np.log(probs[y_i]) /N
                 total_loss += loss 
                 acc += ( y_i == int(np.argmax(probs)))/N
                 
@@ -157,8 +157,8 @@ class ANNClassification:
                 gradients_weights, gradients_biases = backprop(weights_all_layers, biases_all_layers, pre_activations, activations, grad_after_softmax, self.activation_functions)
 
                 # Accumulate gradients
-                gradients_weights_total = [arr1 +  arr2  for arr1, arr2 in zip(gradients_weights_total, gradients_weights)]
-                gradients_biases_total = [arr1 + arr2  for arr1, arr2 in zip(gradients_biases_total, gradients_biases)]
+                gradients_weights_total = [arr1 +  arr2/N  for arr1, arr2 in zip(gradients_weights_total, gradients_weights)]
+                gradients_biases_total = [arr1 + arr2/N  for arr1, arr2 in zip(gradients_biases_total, gradients_biases)]
 
             # Return the gradients
             if get_gradients:
@@ -169,7 +169,7 @@ class ANNClassification:
                         loss = 0
                         for x, y_i in zip(X, y):
                             probs = forward_pass_one_sample(weights_copy, biases_all_layers, x, self.activation_functions)[0]
-                            loss += -np.log(probs[y_i])
+                            loss += -np.log(probs[y_i])/N
                         return loss
 
                     def loss_with_respect_to_BL(BL):
@@ -178,7 +178,7 @@ class ANNClassification:
                         loss = 0
                         for x, y_i in zip(X, y):
                             probs = forward_pass_one_sample(weights_all_layers, biases_copy, x, self.activation_functions)[0]
-                            loss += -np.log(probs[y_i])
+                            loss += -np.log(probs[y_i])/N
                         return loss
 
                     WL = weights_all_layers[grad_layer]
@@ -279,7 +279,7 @@ class ANNRegression:
                 print("Lenght of activation functions does not match units length, the activations functions will defalut to sigmoid")
                 self.activation_functions = ["sig"] * len(units) 
 
-    def fit(self, X, y, seed = 42, lr = 0.01, epochs = 15000, conv_loss = 0.00001):
+    def fit(self, X, y, seed = 42, lr = 0.3, epochs = 15000, conv_loss = 0.00001):
         np.random.seed(seed)
         # Length of data
         N = len(y)
@@ -312,8 +312,8 @@ class ANNRegression:
                 gradients_weights, gradients_biases = backprop(weights_all_layers, biases_all_layers, pre_activations, activations, grad_loss, self.activation_functions)
 
                 # Accumulate gradients
-                gradients_weights_total = [arr1 +  arr2  for arr1, arr2 in zip(gradients_weights_total, gradients_weights)]
-                gradients_biases_total = [arr1 + arr2  for arr1, arr2 in zip(gradients_biases_total, gradients_biases)]
+                gradients_weights_total = [arr1 +  arr2 /N  for arr1, arr2 in zip(gradients_weights_total, gradients_weights)]
+                gradients_biases_total = [arr1 + arr2/N  for arr1, arr2 in zip(gradients_biases_total, gradients_biases)]
             
             # Descend ADD L2 regularization in heree only for weights
             weights_all_layers = [arr1 - lr * (arr2 + 2 * self.lambda_ * arr1) for arr1,arr2 in zip(weights_all_layers, gradients_weights_total)]
@@ -353,56 +353,56 @@ class ANNRegressionPredict():
 
 
 if __name__ == "__main__":
-    # example NN use
-    fitter = ANNClassification(units=[3,4], lambda_=0, activation_functions=["reLU", "reLU"])
-    X_ex = np.array([
-        [1, 2, 3],
-        [4, 5, 6],
-        [7, 8, 9]
-    ], dtype=float)
-    y_ex = np.array([0, 1, 2])
-    # model = fitter.fit(X_ex, y_ex, lr=0.01, epochs=10000)
+    # # example NN use
+    # fitter = ANNClassification(units=[3,4], lambda_=0, activation_functions=["reLU"])
+    # X_ex = np.array([
+    #     [1, 2, 3],
+    #     [4, 5, 6],
+    #     [7, 8, 9]
+    # ], dtype=float)
+    # y_ex = np.array([0, 1, 2])
+    # model = fitter.fit(X_ex, y_ex, lr=0.1, epochs=10000)
     # predictions = model.predict(X_ex)
     # print(predictions)
     
 
-    # Checking gradients
-    fitter = ANNClassification(units=[3,10,50,30,1,4], lambda_=0)
-    X_sq,y_sq = squares()
-    X_d, y_d = doughnut()
-    for X, y in zip([X_sq, X_d, X_ex], [y_sq, y_d, y_ex]):
-        # The layer for which we want to check the gradients
-        for grad_layer in range(len(fitter.units)):
-            print(grad_layer)
-            gradients, num_gradients, bias_gradients, num_bias_gradients = fitter.fit(X, y,epochs=1, get_gradients=True, grad_layer=grad_layer)
-            diff = gradients[grad_layer]- num_gradients
-            diff_bias = bias_gradients[grad_layer] - num_bias_gradients
-            #print(diff)
-            #print(diff_bias)
+    # # Checking gradients
+    # fitter = ANNClassification(units=[3,10,50,30,1,4], lambda_=0)
+    # X_sq,y_sq = squares()
+    # X_d, y_d = doughnut()
+    # for X, y in zip([X_sq, X_d, X_ex], [y_sq, y_d, y_ex]):
+    #     # The layer for which we want to check the gradients
+    #     for grad_layer in range(len(fitter.units)):
+    #         print(grad_layer)
+    #         gradients, num_gradients, bias_gradients, num_bias_gradients = fitter.fit(X, y,epochs=1, get_gradients=True, grad_layer=grad_layer)
+    #         diff = gradients[grad_layer]- num_gradients
+    #         diff_bias = bias_gradients[grad_layer] - num_bias_gradients
+    #         print(diff)
+    #         #print(diff_bias)
             
-            for row in diff:
-                for df in row:
-                    if df > 1e-7:
-                        print(f"Weight grad diff is {df}")
-            for row in diff:
-                for df in row:
-                    if df > 1e-7:
-                        print(f"Bias grad diff is {df}")
+    #         for row in diff:
+    #             for df in row:
+    #                 if df > 1e-7:
+    #                     print(f"Weight grad diff is {df}")
+    #         for row in diff:
+    #             for df in row:
+    #                 if df > 1e-7:
+    #                     print(f"Bias grad diff is {df}")
 
-    # # doughnut
+    # doughnut
     # X,y = doughnut()
     # fitter = ANNClassification(units=[3], lambda_=0.0)
-    # model = fitter.fit(X, y, lr=0.01, seed=100, epochs=3000, conv_loss=0.02)
+    # model = fitter.fit(X, y, lr=1, seed=100, epochs=10000, conv_loss=0.02)
     # predictions = model.predict(X)
 
-    # # squares
-    # X,y = squares()
-    # fitter = ANNClassification(units=[7], lambda_=0.1)
-    # losses, accs = fitter.fit(X, y, lr=0.01, seed=100, epochs=100, conv_loss=0.02, return_loss=True)
+    # squares
+    X,y = squares()
+    fitter = ANNClassification(units=[5], lambda_=0)
+    losses, accs = fitter.fit(X, y, lr=1, seed=100, epochs=10000, conv_loss=0.02, return_loss=True)
     
     
 
-    # # TRY squares with pytorch
+    # TRY squares with pytorch
     # losses = []
     # X = torch.tensor(X, dtype=torch.float32)
     # y = torch.tensor(y, dtype=torch.long) 
