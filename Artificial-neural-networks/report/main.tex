@@ -153,6 +153,8 @@ We also implemented the regression counterpart of the same neural network.
     \item The only change in the backpropagation algorithm occurs in the final layer, where the gradient is scaled by a constant factor of 2 (in comparison to the classification network).
 \end{itemize}
 
+To test our implementation we used the provided tests.
+
 \subsection{Adding regularization}
 We also added the support for L2 regularization for both classification and regression networks. 
 Note that the regularization was only applied to the weights, not to the biases.
@@ -175,7 +177,12 @@ Next, we added support for the ReLU activation function. This required modifying
 0 & \text{otherwise}
 \end{cases}
 \]
-Additionally, we allowed users to customize the activation function used at each layer of the network.
+Additionally, we allowed users to customize the activation function used at each layer
+ of the network. To validate our implementation, we tested the model using ReLU activation
+  functions on both the \textit{doughnut} and \textit{squares} datasets. The network was still
+   able to perfectly fit the data in both cases. Specifically, fitting the \textit{doughnut} 
+   dataset required a single hidden layer with 7 units, while the \textit{squares} dataset 
+   required two hidden layers with 5 units each.
 
 \subsection{Comparing our implementation with PyTorch}
 

@@ -1,5 +1,5 @@
 # Fdb version 4
-["bibtex main"] 0 "main.aux" "main.bbl" "main" 1745346246.53338 0
+["bibtex main"] 0 "main.aux" "main.bbl" "main" 1745401749.74112 0
   "C:/Users/marko/AppData/Local/Programs/MiKTeX/bibtex/bst/ieeetran/IEEEtran.bst" 1440622569 57748 7c8250ecf02814ce6ddc0cdbb63df1dd ""
   "bibliography.bib" 0 -1 0 ""
   "main.aux" 0 -1 0 "pdflatex"
@@ -7,7 +7,7 @@
   "main.bbl"
   "main.blg"
   (rewritten before read)
-["pdflatex"] 1745346244.80147 "c:/Users/marko/Desktop/MLDS/machine-learning-for-data-science-assignments/Artificial-neural-networks/report/main.tex" "main.pdf" "main" 1745346246.53409 0
+["pdflatex"] 1745401748.00039 "c:/Users/marko/Desktop/MLDS/machine-learning-for-data-science-assignments/Artificial-neural-networks/report/main.tex" "main.pdf" "main" 1745401749.74202 0
   "C:/Users/marko/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1744726569 82507 a9eef8696c92627b87e9975edea03b2a ""
   "C:/Users/marko/AppData/Local/MiKTeX/miktex/data/le/pdftex/pdflatex.fmt" 1741285665 24225045 9df87bb9afcf68668f63d57d7a3d7d4c ""
   "C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ec.enc" 1256929440 2375 baa924870cfb487815765f9094cf3728 ""
@@ -172,13 +172,13 @@
   "C:/Users/marko/AppData/Local/Programs/MiKTeX/tex/latex/ucs/utf8x.def" 1700127473 8944 e3433baec74c4b7b278c6b6a547ff9ec ""
   "C:/Users/marko/AppData/Local/Programs/MiKTeX/tex/latex/url/url.sty" 1388490452 12796 8edb7d69a20b857904dd0ea757c14ec9 ""
   "C:/Users/marko/AppData/Local/Programs/MiKTeX/tex/latex/xcolor/xcolor.sty" 1700127522 55487 80a65caedd3722f4c20a14a69e785d8f ""
-  "c:/Users/marko/Desktop/MLDS/machine-learning-for-data-science-assignments/Artificial-neural-networks/report/main.tex" 1745346242 7278 6c9a72052af5eed259d26ed8aa729c6f ""
+  "c:/Users/marko/Desktop/MLDS/machine-learning-for-data-science-assignments/Artificial-neural-networks/report/main.tex" 1745401747 7739 1ad8b380c8847d3f0694aa5f02976565 ""
   "figures/doughnut.png" 1745345951 105809 b7f776fe9e278e1c4696bb04c8dced09 ""
   "figures/squares.png" 1745346132 177973 090decb1d087f61803fc1d9300a22d1a ""
-  "main.aux" 1745346245 2138 9b47356e5e27698c7b91656e8a277a28 "pdflatex"
+  "main.aux" 1745401748 2138 9b47356e5e27698c7b91656e8a277a28 "pdflatex"
   "main.bbl" 0 -1 0 "bibtex main"
-  "main.out" 1745346245 2232 2a90618bd6b044ca60673921825273e0 "pdflatex"
-  "main.tex" 1745346242 7278 6c9a72052af5eed259d26ed8aa729c6f ""
+  "main.out" 1745401748 2232 2a90618bd6b044ca60673921825273e0 "pdflatex"
+  "main.tex" 1745401747 7739 1ad8b380c8847d3f0694aa5f02976565 ""
   (generated)
   "main.aux"
   "main.log"
