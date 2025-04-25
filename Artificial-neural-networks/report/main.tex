@@ -165,6 +165,8 @@ It was implemented by adding the correct term in gradient descent
 \mathbf{W}^{(k)} \leftarrow \mathbf{W}^{(k)} - \eta \left( \nabla_{\mathbf{W}^{(k)}} L + 2\lambda \mathbf{W}^{(k)} \right)
 \]
 
+We tested the implementation by comparing it with the PyTorch implementation in section D.
+
 \subsection{Adding reLU support}
 Next, we added support for the ReLU activation function. This required modifying the gradient computations, as the ReLU function and its derivative are defined as follows:
 \[
@@ -178,13 +180,22 @@ Next, we added support for the ReLU activation function. This required modifying
 \end{cases}
 \]
 Additionally, we allowed users to customize the activation function used at each layer
- of the network. To validate our implementation, we tested the model using ReLU activation
-  functions on both the \textit{doughnut} and \textit{squares} datasets. The network was still
-   able to perfectly fit the data in both cases. Specifically, fitting the \textit{doughnut} 
-   dataset required a single hidden layer with 7 units, while the \textit{squares} dataset 
-   required two hidden layers with 5 units each.
+ of the network. To validate our implementation, we calculated thi differences in our and 
+ numerical gradient and with the same procedure. We also tested the model using ReLU activation
+  functions on the \textit{doughnut} and managed to completly fit the data again.
 
 \subsection{Comparing our implementation with PyTorch}
+We compared the training loss of our custom neural network implementation with an equivalent network implemented in PyTorch. Both networks used three hidden layers with sizes 5, 10, and 5, and employed sigmoid activation functions. We trained the models on the \textit{Iris} dataset from the \texttt{scikit-learn} module for 300 epochs. To evaluate the effect of regularization, we tested four different values of the regularization coefficient. The results are shown in Figure~\ref{fig:pytorch}. As observed, the loss curves follow similar trends between the two implementations. However, when regularization is applied, the overall scale of the losses differs, even though the general shape of the curves remains comparable.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1\columnwidth]{figures/pytorch_comparison.png}
+    \caption{Comparsion of training loss of our implementation with an implementation in PyTorch.}
+    \label{fig:pytorch}
+\end{figure}
+
+
+\section{}
 
 \bibliographystyle{IEEEtran}
 \bibliography{bibliography}

@@ -1,9 +1,11 @@
 import numpy as np
 import csv
-from torch import nn
 import torch
-from torch import optim
+import torch.nn as nn
 import torch.nn.init as init
+from sklearn.metrics import accuracy_score
+from sklearn.datasets import load_iris
+import matplotlib.pyplot as plt
 
 # data reading
 def read_tab(fn, adict):
@@ -228,7 +230,7 @@ class ANNClassification:
             accs.append(acc)
 
         if return_loss:
-            return losses, accs
+            return losses, accs,ANNClassificationPredict(weights_all_layers, biases_all_layers, self.activation_functions)
         
         return ANNClassificationPredict(weights_all_layers, biases_all_layers, self.activation_functions)
                 
@@ -350,6 +352,31 @@ class ANNRegressionPredict():
     def predict(self, X):
         return np.array([forward_pass_one_sample_reg(self.weights_list, self.biases, x, self.activation_functions)[0][-1][0] for x in X])
 
+# Use PyTorch
+class ANNPytorch(nn.Module):
+    def __init__(self, input_dim, output_dim):
+        super(ANNPytorch, self).__init__()
+        
+        self.model = nn.Sequential(
+            nn.Linear(input_dim, 5),
+            nn.Sigmoid(),
+            nn.Linear(5, 10),
+            nn.Sigmoid(),
+            nn.Linear(10, 5),
+            nn.Sigmoid(),
+            nn.Linear(5, output_dim)
+        )
+
+        scale = 5 
+        for layer in self.model:
+            if isinstance(layer, nn.Linear):
+                init.xavier_normal_(layer.weight)
+                layer.weight.data *= scale  
+                if layer.bias is not None:
+                    init.zeros_(layer.bias)
+
+    def forward(self, x):
+        return self.model(x)
 
 
 if __name__ == "__main__":
@@ -366,70 +393,151 @@ if __name__ == "__main__":
     print(predictions)
     
 
-    # # Checking gradients
-    # fitter = ANNClassification(units=[3,10,50,30,1,4], lambda_=0)
-    # X_sq,y_sq = squares()
-    # X_d, y_d = doughnut()
-    # for X, y in zip([X_sq, X_d, X_ex], [y_sq, y_d, y_ex]):
-    #     # The layer for which we want to check the gradients
-    #     for grad_layer in range(len(fitter.units)):
-    #         print(grad_layer)
-    #         gradients, num_gradients, bias_gradients, num_bias_gradients = fitter.fit(X, y,epochs=1, get_gradients=True, grad_layer=grad_layer)
-    #         diff = gradients[grad_layer]- num_gradients
-    #         diff_bias = bias_gradients[grad_layer] - num_bias_gradients
-    #         print(diff)
-    #         #print(diff_bias)
+    # Checking gradients
+    fitter = ANNClassification(units=[3,10,50,30,1,4], lambda_=0, activation_functions=["reLU","reLU","reLU","reLU","reLU", "reLU"])
+    X_sq,y_sq = squares()
+    X_d, y_d = doughnut()
+    for X, y in zip([X_sq, X_d, X_ex], [y_sq, y_d, y_ex]):
+        # The layer for which we want to check the gradients
+        for grad_layer in range(len(fitter.units)):
+            print(grad_layer)
+            gradients, num_gradients, bias_gradients, num_bias_gradients = fitter.fit(X, y,epochs=1, get_gradients=True, grad_layer=grad_layer)
+            diff = gradients[grad_layer]- num_gradients
+            diff_bias = bias_gradients[grad_layer] - num_bias_gradients
+            #print(diff)
+            #print(diff_bias)
             
-    #         for row in diff:
-    #             for df in row:
-    #                 if df > 1e-7:
-    #                     print(f"Weight grad diff is {df}")
-    #         for row in diff:
-    #             for df in row:
-    #                 if df > 1e-7:
-    #                     print(f"Bias grad diff is {df}")
-
-    # doughnut
+            for row in diff:
+                for df in row:
+                    if df > 1e-7:
+                        print(f"Weight grad diff is {df}")
+            for row in diff:
+                for df in row:
+                    if df > 1e-7:
+                        print(f"Bias grad diff is {df}")
+    # # doughnut
     # X,y = doughnut()
-    # fitter = ANNClassification(units=[3], lambda_=0.0)
+    # fitter = ANNClassification(units=[3], lambda_=0)
+    # model = fitter.fit(X, y, lr=1, seed=100, epochs=10000, conv_loss=0.02)
+    # predictions = model.predict(X)
+    # fig, axes = plt.subplots(1,2, figsize=(12,6))
+
+    # axes[0].scatter(X[:, 0], X[:, 1], c=y, cmap='viridis') 
+    # axes[0].set_title("Ground truth Labels", fontsize=20)
+    # axes[0].set_ylabel("y", rotation=0, fontsize=20)
+    # axes[0].set_xlabel("x", rotation=0, fontsize=20)
+
+    # # Convert softmax probabilities to predicted class labels
+    # predicted_labels = np.argmax(predictions, axis=1)
+
+    # # Plot with predicted labels
+    # axes[1].scatter(X[:, 0], X[:, 1], c=predicted_labels, cmap="jet")
+    # axes[1].set_title("Predicted Labels", fontsize=20)
+    # axes[1].set_ylabel("y", rotation=0, fontsize=20)
+    # axes[1].set_xlabel("x", rotation=0, fontsize=20)
+    # plt.show()
+    # #plt.savefig("report/figures/doughnut.png")
+
+    # # squares
+    # X,y = squares()
+    # fitter = ANNClassification(units=[5], lambda_=0)
+    # model = fitter.fit(X, y, lr=1, seed=100, epochs=20000, conv_loss=0.01)
+    # predictions = model.predict(X)
+    # fig, axes = plt.subplots(1,2, figsize=(12,6))
+    # axes[0].scatter(X[:, 0], X[:, 1], c=y, cmap='viridis') 
+    # axes[0].set_title("Ground truth Labels", fontsize=20)
+    # axes[0].set_ylabel("y", rotation=0, fontsize=20)
+    # axes[0].set_xlabel("x", rotation=0, fontsize=20)
+
+    # # Convert softmax probabilities to predicted class labels
+    # predicted_labels = np.argmax(predictions, axis=1)
+
+    # # Plot with predicted labels
+    # axes[1].scatter(X[:, 0], X[:, 1], c=predicted_labels, cmap="jet")
+    # axes[1].set_title("Predicted Labels", fontsize=20)
+    # axes[1].set_ylabel("y", rotation=0, fontsize=20)
+    # axes[1].set_xlabel("x", rotation=0, fontsize=20)
+    # #plt.savefig("report/figures/squares.png")
+    # plt.show()
+    
+    # # Testing relu
+    # X,y = doughnut()
+    # fitter = ANNClassification(units=[7], lambda_=0, activation_functions=["reLU"])
     # model = fitter.fit(X, y, lr=1, seed=100, epochs=10000, conv_loss=0.02)
     # predictions = model.predict(X)
 
-    # squares
-    X,y = squares()
-    fitter = ANNClassification(units=[5], lambda_=0)
-    losses, accs = fitter.fit(X, y, lr=1, seed=100, epochs=10000, conv_loss=0.02, return_loss=True)
+
+    # Comparing with pytorch
+    lambdas = [0, 0.001, 0.01, 0.1]
+    units = [5,10,5]
+    epochs = 300
+
+    data = load_iris()
+    X, y = data.data, data.target
+    X_train, y_train= X,y
+    torch.manual_seed(42)
+
+
+    X_torch_train =  torch.tensor(X_train, dtype=torch.float32)
+    #X_torch_test =  torch.tensor(X_test, dtype=torch.float32)
+
+    y_torch_train = torch.tensor(y_train, dtype=torch.long)
+    #y_torch_test = torch.tensor(y_test, dtype=torch.long)
+    output_dim = len(np.unique(y))
+
+
+    fig, ax = plt.subplots(2,2, figsize=(15,12))
+    for i , lambda_ in enumerate(lambdas):
+        print(f"lambda: {lambda_}")
+        #  implementation
+        ann_custom = ANNClassification(units=units, lambda_=lambda_)
+        losses_my, accs_my, model = ann_custom.fit(X, y, lr=0.1, 
+                                            seed=42, epochs=epochs,
+                                                return_loss=True, verbose=False)
+        
+
+        acc_my = accs_my[-1]
+        loss_my = losses_my[-1]
+
+        # PyTorch implementation
+        model = ANNPytorch(input_dim=X.shape[1], output_dim=output_dim)
+        criterion = torch.nn.CrossEntropyLoss()
+        optimizer = torch.optim.SGD(model.parameters(), lr=0.1, weight_decay=lambda_)
+
+        losses_pt = []
+        accs_pt = []
+
+        for epoch in range(epochs):
+            model.train()
+            optimizer.zero_grad()
+            logits = model(X_torch_train) 
+            loss = criterion(logits, y_torch_train)
+            loss.backward()
+            optimizer.step()
+
+            # Store the loss and accuracy for each epoch
+            losses_pt.append(loss.item())
+            pred = torch.argmax(logits, dim=1)
+            acc = (pred == y_torch_train).float().mean()
+            accs_pt.append(acc.item())
+
     
-    
+        preds = torch.argmax(model(X_torch_train), dim=1)
+        acc_pt = accuracy_score(y, preds.detach().numpy())
+        loss_pt = losses_pt[-1]
 
-    # TRY squares with pytorch
-    # losses = []
-    # X = torch.tensor(X, dtype=torch.float32)
-    # y = torch.tensor(y, dtype=torch.long) 
-    # model = ANNPytorch(input_dim=X.shape[1],
-    #                     output_dim=len(np.unique(y)), units=[5], 
-    #                     activations=["sig", "sig"], lambda_=0.0)
-    # criterion = nn.CrossEntropyLoss()
-    # optimizer = optim.SGD(model.parameters(), lr=1, weight_decay=model.lambda_)
+        # Plot
+        row, col = i // 2, i % 2
+        ax[row, col].plot(losses_my, label="Custom NN Loss")
+        ax[row, col].plot(losses_pt, label="PyTorch NN Loss")
+        ax[row, col].set_title(f"Loss Comparison (λ = {lambda_})")
+        ax[row, col].set_xlabel("Epochs")
+        ax[row, col].set_ylabel("Loss")
+        ax[row, col].legend()
+        ax[row, col].grid(True)
 
-    # epochs = 3000
-    # torch.manual_seed(2)
-    # for epoch in range(epochs):
-    #     model.train()
-
-    #     logits = model(X)
-    #     loss = criterion(logits, y)
-    #     acc = (pred == y).float().mean()
-    #     optimizer.zero_grad()
-    #     loss.backward()
-    #     optimizer.step()
-
-    #     if epoch % 100 == 0:
-    #         pred = torch.argmax(logits, dim=1)
-    #         print(f"Epoch {epoch} | Loss: {loss.item():.4f} | Acc: {acc:.4f}")
-
-    #     losses.append(loss)
-    #     accs.append(acc)
-
+    plt.tight_layout()
+    plt.show()
+    #plt.savefig("report/figures/pytorch_comparison.png")
 
 

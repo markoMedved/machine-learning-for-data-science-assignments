@@ -341,6 +341,17 @@ INPUT C:\Users\marko\AppData\Local\Programs\MiKTeX\fonts\enc\dvips\lm\lm-mathit.
 INPUT C:\Users\marko\AppData\Local\Programs\MiKTeX\fonts\enc\dvips\lm\lm-mathsy.enc
 INPUT C:\Users\marko\AppData\Local\Programs\MiKTeX\fonts\enc\dvips\lm\lm-mathex.enc
 INPUT C:\Users\marko\AppData\Local\Programs\MiKTeX\fonts\enc\dvips\lm\lm-rm.enc
+INPUT C:\Users\marko\AppData\Local\Programs\MiKTeX\tex\latex\lm\t1lmtt.fd
+INPUT C:\Users\marko\AppData\Local\Programs\MiKTeX\tex\latex\lm\t1lmtt.fd
+INPUT C:\Users\marko\AppData\Local\Programs\MiKTeX\tex\latex\lm\t1lmtt.fd
+INPUT C:\Users\marko\AppData\Local\Programs\MiKTeX\fonts\tfm\public\lm\ec-lmtt9.tfm
+INPUT .\figures\pytorch_comparison.png
+INPUT .\figures\pytorch_comparison.png
+INPUT .\figures\pytorch_comparison.png
+INPUT .\figures\pytorch_comparison.png
+INPUT .\figures\pytorch_comparison.png
+INPUT .\figures\pytorch_comparison.png
+INPUT .\figures\pytorch_comparison.png
 INPUT main.aux
 INPUT .\main.out
 INPUT .\main.out
@@ -378,3 +389,5 @@ INPUT C:\Users\marko\AppData\Local\Programs\MiKTeX\fonts\type1\public\lm\lmsy6.p
 INPUT C:\Users\marko\AppData\Local\Programs\MiKTeX\fonts\type1\public\lm\lmsy6.pfb
 INPUT C:\Users\marko\AppData\Local\Programs\MiKTeX\fonts\type1\public\lm\lmsy9.pfb
 INPUT C:\Users\marko\AppData\Local\Programs\MiKTeX\fonts\type1\public\lm\lmsy9.pfb
+INPUT C:\Users\marko\AppData\Local\Programs\MiKTeX\fonts\type1\public\lm\lmtt9.pfb
+INPUT C:\Users\marko\AppData\Local\Programs\MiKTeX\fonts\type1\public\lm\lmtt9.pfb
