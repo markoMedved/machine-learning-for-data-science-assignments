@@ -36,7 +36,7 @@ def init_glorot(all_units):
     for i in range(len(all_units) - 1):
         fan_in = all_units[i]
         fan_out = all_units[i + 1]
-        # NOTE: here we multiply by 3, since otherwise it couldnt completly fit the squares, doughnut
+        # NOTE: here we multiply by 5, since otherwise it couldnt completly fit the squares, doughnut
         std = 5* np.sqrt(2 / (fan_in + fan_out))  # Glorot normal
         weights = np.random.normal(loc=0, scale=std, size=(fan_out, fan_in))
         weights_all_layers.append(weights)
@@ -120,7 +120,7 @@ class ANNClassification:
                 self.activation_functions = ["sig"] * len(units) 
 
 
-    def fit(self, X, y, seed = 42, lr = 0.3, epochs = 50000, conv_loss = 0.001, get_gradients=False, grad_layer=-1, return_loss=False, verbose=True):
+    def fit(self, X, y, seed = 42, lr = 0.3, epochs = 50000, conv_loss = 0.001, get_gradients=False, grad_layer=-1, return_loss=False, verbose=False):
         np.random.seed(seed)
 
         # Get the number of classes, and length of data
@@ -281,7 +281,7 @@ class ANNRegression:
                 print("Lenght of activation functions does not match units length, the activations functions will defalut to sigmoid")
                 self.activation_functions = ["sig"] * len(units) 
 
-    def fit(self, X, y, seed = 42, lr = 0.3, epochs = 15000, conv_loss = 0.00001):
+    def fit(self, X, y, seed = 42, lr = 0.3, epochs = 15000, conv_loss = 0.00001, verbose= False):
         np.random.seed(seed)
         # Length of data
         N = len(y)
@@ -321,7 +321,7 @@ class ANNRegression:
             weights_all_layers = [arr1 - lr * (arr2 + 2 * self.lambda_ * arr1) for arr1,arr2 in zip(weights_all_layers, gradients_weights_total)]
             biases_all_layers = [arr1 - lr*arr2 for arr1, arr2 in  zip(biases_all_layers, gradients_biases_total)]
 
-            if epoch % 1000 == 0 or total_loss > 2:
+            if (epoch % 1000 == 0 or total_loss > 2) and verbose:
                 print(f"loss: {total_loss}, epoch: {epoch}")
 
             if total_loss < conv_loss:
@@ -415,56 +415,56 @@ if __name__ == "__main__":
                 for df in row:
                     if df > 1e-7:
                         print(f"Bias grad diff is {df}")
-    # # doughnut
-    # X,y = doughnut()
-    # fitter = ANNClassification(units=[3], lambda_=0)
-    # model = fitter.fit(X, y, lr=1, seed=100, epochs=10000, conv_loss=0.02)
-    # predictions = model.predict(X)
-    # fig, axes = plt.subplots(1,2, figsize=(12,6))
+    # doughnut
+    X,y = doughnut()
+    fitter = ANNClassification(units=[3], lambda_=0)
+    model = fitter.fit(X, y, lr=1, seed=100, epochs=10000, conv_loss=0.02)
+    predictions = model.predict(X)
+    fig, axes = plt.subplots(1,2, figsize=(12,6))
 
-    # axes[0].scatter(X[:, 0], X[:, 1], c=y, cmap='viridis') 
-    # axes[0].set_title("Ground truth Labels", fontsize=20)
-    # axes[0].set_ylabel("y", rotation=0, fontsize=20)
-    # axes[0].set_xlabel("x", rotation=0, fontsize=20)
+    axes[0].scatter(X[:, 0], X[:, 1], c=y, cmap='viridis') 
+    axes[0].set_title("Ground truth Labels", fontsize=20)
+    axes[0].set_ylabel("y", rotation=0, fontsize=20)
+    axes[0].set_xlabel("x", rotation=0, fontsize=20)
 
-    # # Convert softmax probabilities to predicted class labels
-    # predicted_labels = np.argmax(predictions, axis=1)
+    # Convert softmax probabilities to predicted class labels
+    predicted_labels = np.argmax(predictions, axis=1)
 
-    # # Plot with predicted labels
-    # axes[1].scatter(X[:, 0], X[:, 1], c=predicted_labels, cmap="jet")
-    # axes[1].set_title("Predicted Labels", fontsize=20)
-    # axes[1].set_ylabel("y", rotation=0, fontsize=20)
-    # axes[1].set_xlabel("x", rotation=0, fontsize=20)
-    # plt.show()
-    # #plt.savefig("report/figures/doughnut.png")
+    # Plot with predicted labels
+    axes[1].scatter(X[:, 0], X[:, 1], c=predicted_labels, cmap="jet")
+    axes[1].set_title("Predicted Labels", fontsize=20)
+    axes[1].set_ylabel("y", rotation=0, fontsize=20)
+    axes[1].set_xlabel("x", rotation=0, fontsize=20)
+    plt.show()
+    #plt.savefig("report/figures/doughnut.png")
 
-    # # squares
-    # X,y = squares()
-    # fitter = ANNClassification(units=[5], lambda_=0)
-    # model = fitter.fit(X, y, lr=1, seed=100, epochs=20000, conv_loss=0.01)
-    # predictions = model.predict(X)
-    # fig, axes = plt.subplots(1,2, figsize=(12,6))
-    # axes[0].scatter(X[:, 0], X[:, 1], c=y, cmap='viridis') 
-    # axes[0].set_title("Ground truth Labels", fontsize=20)
-    # axes[0].set_ylabel("y", rotation=0, fontsize=20)
-    # axes[0].set_xlabel("x", rotation=0, fontsize=20)
+    # squares
+    X,y = squares()
+    fitter = ANNClassification(units=[5], lambda_=0)
+    model = fitter.fit(X, y, lr=1, seed=100, epochs=20000, conv_loss=0.01)
+    predictions = model.predict(X)
+    fig, axes = plt.subplots(1,2, figsize=(12,6))
+    axes[0].scatter(X[:, 0], X[:, 1], c=y, cmap='viridis') 
+    axes[0].set_title("Ground truth Labels", fontsize=20)
+    axes[0].set_ylabel("y", rotation=0, fontsize=20)
+    axes[0].set_xlabel("x", rotation=0, fontsize=20)
 
-    # # Convert softmax probabilities to predicted class labels
-    # predicted_labels = np.argmax(predictions, axis=1)
+    # Convert softmax probabilities to predicted class labels
+    predicted_labels = np.argmax(predictions, axis=1)
 
-    # # Plot with predicted labels
-    # axes[1].scatter(X[:, 0], X[:, 1], c=predicted_labels, cmap="jet")
-    # axes[1].set_title("Predicted Labels", fontsize=20)
-    # axes[1].set_ylabel("y", rotation=0, fontsize=20)
-    # axes[1].set_xlabel("x", rotation=0, fontsize=20)
-    # #plt.savefig("report/figures/squares.png")
-    # plt.show()
+    # Plot with predicted labels
+    axes[1].scatter(X[:, 0], X[:, 1], c=predicted_labels, cmap="jet")
+    axes[1].set_title("Predicted Labels", fontsize=20)
+    axes[1].set_ylabel("y", rotation=0, fontsize=20)
+    axes[1].set_xlabel("x", rotation=0, fontsize=20)
+    #plt.savefig("report/figures/squares.png")
+    plt.show()
     
-    # # Testing relu
-    # X,y = doughnut()
-    # fitter = ANNClassification(units=[7], lambda_=0, activation_functions=["reLU"])
-    # model = fitter.fit(X, y, lr=1, seed=100, epochs=10000, conv_loss=0.02)
-    # predictions = model.predict(X)
+    # Testing relu
+    X,y = doughnut()
+    fitter = ANNClassification(units=[7], lambda_=0, activation_functions=["reLU"])
+    model = fitter.fit(X, y, lr=1, seed=100, epochs=10000, conv_loss=0.02)
+    predictions = model.predict(X)
 
 
     # Comparing with pytorch

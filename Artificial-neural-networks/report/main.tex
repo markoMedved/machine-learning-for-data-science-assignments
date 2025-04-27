@@ -53,7 +53,8 @@ We implemented a fully connected neural network with an arbitrary number of laye
   for the input and output layers. Since the task involves multi-class classification,
    we used the softmax function on the output layer (applied to the logits).
 
-   To initialize the weights we used the Xavier(Glorot) normal initialization: 
+   To initialize the weights we used the Xavier(Glorot) normal initialization, which works good
+   when using the Sigmoid activation function: 
    \[
     W \sim \mathcal{N}\left(0, \, c \cdot \frac{2}{n_\text{in} + n_\text{out}}\right)
    \]
@@ -164,7 +165,7 @@ It was implemented by adding the correct term in gradient descent
 \[
 \mathbf{W}^{(k)} \leftarrow \mathbf{W}^{(k)} - \eta \left( \nabla_{\mathbf{W}^{(k)}} L + 2\lambda \mathbf{W}^{(k)} \right)
 \]
-
+Where $\eta$ is the learning rate and $\lambda$ is the regularization constant.\\
 We tested the implementation by comparing it with the PyTorch implementation in section D.
 
 \subsection{Adding reLU support}
@@ -180,8 +181,8 @@ Next, we added support for the ReLU activation function. This required modifying
 \end{cases}
 \]
 Additionally, we allowed users to customize the activation function used at each layer
- of the network. To validate our implementation, we calculated thi differences in our and 
- numerical gradient and with the same procedure. We also tested the model using ReLU activation
+ of the network. To validate our implementation, we calculated this differences in our and 
+ numerical gradients with the same procedure as for the Sigmoid. We also tested the model using ReLU activation
   functions on the \textit{doughnut} and managed to completly fit the data again.
 
 \subsection{Comparing our implementation with PyTorch}
@@ -195,7 +196,23 @@ We compared the training loss of our custom neural network implementation with a
 \end{figure}
 
 
-\section{}
+\section{Competition part}
+For our competition, we designed a fully connected neural network with two hidden layers, each containing 45 activations, and ReLU activation functions. We observed that adding more layers worsened the performance, so we kept the architecture simple with just two hidden layers. To add regularization, we incorporated Dropout layers into the network.
+
+The input features consisted of spectral data at each pixel, with the positions of the pixels appended to the end of each feature vector. This combination allowed us to leverage both spectral and positional information for training.
+
+To find the optimal configuration for the number of activations in the hidden layers, learning rate, and the number of epochs, we followed a structured approach. First, we split the dataset into 32 subsets, as illustrated in Figure~\ref{fig:samples}. We then filtered these splits based on the number of annotated pixels, applying a threshold to retain only those with sufficient annotations. This process resulted in 13 valid splits.
+
+Next, we performed cross-validation on these 13 splits and selected the model parameters that resulted in the lowest average log loss across all splits. This gave us the optimal configuration for our fully connected network.
+
+Additionally, we experimented with 1D convolutional neural networks (CNNs) applied over the spectrum, excluding the positional data. However, we found that the performance of these CNN models did not come close to matching that of the basic fully connected networks.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1\columnwidth]{figures/samples.png}
+    \caption{Cross validation splits}
+    \label{fig:samples}
+\end{figure}
 
 \bibliographystyle{IEEEtran}
 \bibliography{bibliography}
