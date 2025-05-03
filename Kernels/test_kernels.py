@@ -2,8 +2,7 @@ import unittest
 from unittest.mock import patch
 import numpy as np
 
-from hw_kernels import SVR, RBF, Polynomial, \
-    KernelizedRidgeRegression
+from hw_kernels import  RBF, Polynomial, SVR, KernelizedRidgeRegression
 
 
 class Linear:
@@ -96,18 +95,21 @@ class SVRTests(unittest.TestCase):
         fitter = SVR(kernel=Linear(), lambda_=0.0001, epsilon=0.1)
         m = fitter.fit(self.X, self.y)
         pred = m.predict(self.X)
+
         np.testing.assert_allclose(pred, self.y, atol=0.11)
 
     def test_rbf(self):
         fitter = SVR(kernel=RBF(sigma=0.5), lambda_=0.0001, epsilon=0.1)
         m = fitter.fit(self.X, self.y)
         pred = m.predict(self.X)
+
         np.testing.assert_allclose(pred, self.y, atol=0.11)
 
     def test_polynomial(self):
         fitter = SVR(kernel=Polynomial(M=2), lambda_=0.0001, epsilon=0.1)
         m = fitter.fit(self.X, self.y)
         pred = m.predict(self.X)
+        print(pred, self.y)
         np.testing.assert_allclose(pred, self.y, atol=0.11)
 
     def test_predictor_get_info(self):
