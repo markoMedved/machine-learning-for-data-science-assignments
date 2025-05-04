@@ -7,7 +7,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import KFold
 
-# TODO: cross validation for all evaluations, finish cross validation for picking lmabda
+# TODO epsilon setting for part 2
 # TODO: part 3
 
 
@@ -168,36 +168,72 @@ class SVRPredict:
 
     
 if __name__ == "__main__":
-    # sine = pd.read_csv("sine.csv")
-    # X = sine["x"].values.reshape(-1,1)
-    # y = sine["y"].values
+    #####################################
+    # PART 1 
+    #################################
 
-    # # RBF works nicely
-    # fitter = SVR(RBF(sigma=1), epsilon=0.1, lambda_=0.1)
-    # model = fitter.fit(X, y)
-    # pred = model.predict(X)
-    # sv_indices = fitter.support_vectors()
-    # X_sv = X[sv_indices]
-    # y_sv = y[sv_indices]
+    sine = pd.read_csv("sine.csv")
+    X = sine["x"].values.reshape(-1, 1)
+    y = sine["y"].values
 
-    # # Visualize data
-    # plt.scatter(X[~np.isin(np.arange(len(X)), sv_indices)], 
-    #             y[~np.isin(np.arange(len(X)), sv_indices)], 
-    #             label="Non-Support Vectors", color='lightblue')
-    # plt.scatter(X, pred, label="Predictions", color='orange')
+    fig, ax = plt.subplots(2, 2, figsize=(12, 8))
 
-    # plt.scatter(X[sv_indices], y[sv_indices], label="Support Vectors",
-    #              color='lightblue', edgecolor='black', marker='o')  
-    # plt.show()
+    # --- SVR with RBF ---
+    svr_rbf = SVR(RBF(sigma=1), epsilon=0.1, lambda_=0.1)
+    model_rbf_svr = svr_rbf.fit(X, y)
+    pred_rbf_svr = model_rbf_svr.predict(X)
+    sv_indices_rbf = svr_rbf.support_vectors()
 
-    # fitter = KernelizedRidgeRegression(RBF(sigma=1), lambda_=0.1)
-    # model = fitter.fit(X, y)
-    # pred = model.predict(X)
-    # plt.scatter(X, y)
-    # plt.scatter(X,pred)
-    # plt.show()
+    ax[0, 0].scatter(X[~np.isin(np.arange(len(X)), sv_indices_rbf)], 
+                    y[~np.isin(np.arange(len(X)), sv_indices_rbf)], 
+                    color='lightblue', label="Non-Support Vectors")
+    ax[0, 0].scatter(X[sv_indices_rbf], y[sv_indices_rbf], 
+                    color='lightblue', edgecolor='black', label="Support Vectors")
+    ax[0, 0].scatter(X, pred_rbf_svr, color='orange', label="Prediction")
+    ax[0, 0].set_title("SVR - RBF Kernel")
+    ax[0, 0].legend()
 
+    # --- Kernel Ridge with RBF ---
+    rr_rbf = KernelizedRidgeRegression(RBF(sigma=1), lambda_=0.1)
+    model_rbf_rr = rr_rbf.fit(X, y)
+    pred_rbf_rr = model_rbf_rr.predict(X)
+
+    ax[0, 1].scatter(X, y, label="Data", color='lightblue')
+    ax[0, 1].scatter(X, pred_rbf_rr, label="Prediction", color='orange')
+    ax[0, 1].set_title("Ridge Regression - RBF Kernel")
+    ax[0, 1].legend()
+
+    # --- SVR with Polynomial ---
+    svr_poly = SVR(Polynomial(M=3), epsilon=0.1, lambda_=0.1)
+    model_poly_svr = svr_poly.fit(X, y)
+    pred_poly_svr = model_poly_svr.predict(X)
+    sv_indices_poly = svr_poly.support_vectors()
+
+    ax[1, 0].scatter(X[~np.isin(np.arange(len(X)), sv_indices_poly)], 
+                    y[~np.isin(np.arange(len(X)), sv_indices_poly)], 
+                    color='lightblue', label="Non-Support Vectors")
+    ax[1, 0].scatter(X[sv_indices_poly], y[sv_indices_poly], 
+                    color='lightblue', edgecolor='black', label="Support Vectors")
+    ax[1, 0].scatter(X, pred_poly_svr, color='orange', label="Prediction")
+    ax[1, 0].set_title("SVR - Polynomial Kernel")
+    ax[1, 0].legend()
+
+    # --- Kernel Ridge with Polynomial ---
+    rr_poly = KernelizedRidgeRegression(Polynomial(M=3), lambda_=0.1)
+    model_poly_rr = rr_poly.fit(X, y)
+    pred_poly_rr = model_poly_rr.predict(X)
+
+    ax[1, 1].scatter(X, y, label="Data", color='lightblue')
+    ax[1, 1].scatter(X, pred_poly_rr, label="Prediction", color='orange')
+    ax[1, 1].set_title("Ridge Regression - Polynomial Kernel")
+    ax[1, 1].legend()
+
+    plt.tight_layout()
+    plt.show()
+
+    ########################################
     ## PART2
+    #########################################
 
     # Housing data 
     df = pd.read_csv("housing2r.csv")
@@ -207,64 +243,132 @@ if __name__ == "__main__":
     scaler = StandardScaler()
     X = scaler.fit_transform(X)
 
+    k = 10
+    kf = KFold(k, shuffle=True, random_state=42)
+
     Ms = np.arange(1,11)
+    lambdas = [0.001, 0.01, 0.1, 1, 10, 100]
 
+    mse_RR_pol = []
+    mse_cv_RR_pol = []
+    mse_SVR_pol = []
+    mse_cv_SVR_pol = []
 
-    mse_RR = []
-    mse_cv_RR = []
-    mse_SVR = []
-    mse_cv_SVR = []
+    sv_pol = []
+    sv_cv_pol = []
 
-    kf = KFold(5, shuffle=True, random_state=42)
 
     # Polynomial
     for M in Ms:
-        # KRR
-        fitter = KernelizedRidgeRegression(kernel=Polynomial(M=M), lambda_=1)
-        model = fitter.fit(X,y)
-        preds = model.predict(X)
-        mse_RR.append(mean_squared_error(y, preds))
+        mse_SVR_tmp = []
+        mse_RR_tmp = []
+        sv = 0
+        # lambda = 1
+        for train_index, test_index in kf.split(X):
+            X_train, X_test = X[train_index], X[test_index]
+            y_train, y_test = y[train_index], y[test_index]
 
-        fitter = SVR(kernel=Polynomial(M=M), lambda_=1, epsilon=0.1) # TODO set epsilon
-        model = fitter.fit(X,y)
-        preds = model.predict(X)
-        mse_SVR.append(mean_squared_error(y, preds))
+            fitter = KernelizedRidgeRegression(kernel=Polynomial(M=M), lambda_=1)
+            model = fitter.fit(X_train,y_train)
+            preds = model.predict(X_test)
+            mse_RR_tmp.append(mean_squared_error(y_test, preds))
+
+            fitter = SVR(kernel=Polynomial(M=M), lambda_=1, epsilon=0.1) # TODO set epsilon
+            model = fitter.fit(X_train,y_train)
+            preds = model.predict(X_test)
+            mse_SVR_tmp.append(mean_squared_error(y_test, preds))
+
+            sv += len(fitter.support_vectors())
+        
+        # Average support vectors in the split
+        sv /= k
+        sv_pol.append(sv)
+
+        mse_RR_pol.append(np.mean(mse_RR_tmp))
+        mse_SVR_pol.append(np.mean(mse_SVR_tmp))
 
         # Cross validation
+        rr_cv_scores = []
+        svr_cv_scores = []
+        svr_cv_sv_counts = []
 
-    
-    plt.plot(Ms, mse_RR, label = "Ridge Regression")
-    plt.plot(Ms, mse_SVR, label = "SVR")
-    plt.ylabel("MSE")
-    plt.xlabel("Degree")
-    plt.legend()
-    plt.show()
+        
+        for lambda_ in lambdas:
+            mse_rr_lmbd, mse_svr_lmbd = [], []
+            sv_count = 0
+
+            for train_index, test_index in kf.split(X):
+                X_train, X_test = X[train_index], X[test_index]
+                y_train, y_test = y[train_index], y[test_index]
+
+                rr = KernelizedRidgeRegression(kernel=Polynomial(M=M), lambda_=lambda_)
+                svr = SVR(kernel=Polynomial(M=M), lambda_=lambda_, epsilon=0.1)
+
+                pred_rr = rr.fit(X_train, y_train).predict(X_test)
+                pred_svr = svr.fit(X_train, y_train).predict(X_test)
+
+                mse_rr_lmbd.append(mean_squared_error(y_test, pred_rr))
+                mse_svr_lmbd.append(mean_squared_error(y_test, pred_svr))
+
+                sv_count += len(svr.support_vectors())
+
+            rr_cv_scores.append(np.mean(mse_rr_lmbd))
+            svr_cv_scores.append(np.mean(mse_svr_lmbd))
+            svr_cv_sv_counts.append(sv_count / k)  # avg over folds
+
+        mse_cv_RR_pol.append(min(rr_cv_scores))
+        mse_cv_SVR_pol.append(min(svr_cv_scores))
+
+        # Get support vector count corresponding to best lambda for SVR
+        best_lambda_idx = np.argmin(svr_cv_scores)
+        sv_cv_pol.append(svr_cv_sv_counts[best_lambda_idx])
+
 
     # RBF
     mse_RR = []
     mse_cv_RR = []
     mse_SVR = []
     mse_cv_SVR = []
+    sv_rbf = []         # Support vectors for lambda=1
+    sv_cv_rbf = []      # Support vectors for best lambda (CV)
 
-    sigmas = [0.001,0.01,0.1,1,2,3,4,5,8,10, 100]
-    lambdas = [0.001, 0.01, 0.1, 1, 10, 100]
+    sigmas = [0.001, 0.01, 0.1, 1, 2, 3, 4, 5, 8, 10, 100]
 
     for sigma in sigmas:
-        # lambda = 1
-        fitter = KernelizedRidgeRegression(kernel=RBF(sigma=sigma), lambda_=1)
-        model = fitter.fit(X,y)
-        preds = model.predict(X)
-        mse_RR.append(mean_squared_error(y, preds))
+        mse_SVR_tmp = []
+        mse_RR_tmp = []
+        sv = 0
 
-        fitter = SVR(kernel=RBF(sigma=sigma), lambda_=1, epsilon=0.1) # TODO set epsilon
-        model = fitter.fit(X,y)
-        preds = model.predict(X)
-        mse_SVR.append(mean_squared_error(y, preds))
+        # lambda = 1
+        for train_index, test_index in kf.split(X):
+            X_train, X_test = X[train_index], X[test_index]
+            y_train, y_test = y[train_index], y[test_index]
+
+            fitter = KernelizedRidgeRegression(kernel=RBF(sigma=sigma), lambda_=1)
+            model = fitter.fit(X_train, y_train)
+            preds = model.predict(X_test)
+            mse_RR_tmp.append(mean_squared_error(y_test, preds))
+
+            fitter = SVR(kernel=RBF(sigma=sigma), lambda_=1, epsilon=0.1)
+            model = fitter.fit(X_train, y_train)
+            preds = model.predict(X_test)
+            mse_SVR_tmp.append(mean_squared_error(y_test, preds))
+
+            sv += len(fitter.support_vectors())
+
+        mse_RR.append(np.mean(mse_RR_tmp))
+        mse_SVR.append(np.mean(mse_SVR_tmp))
+        sv_rbf.append(sv / k)
 
         # Cross validation
+        rr_cv_scores = []
+        svr_cv_scores = []
+        svr_cv_sv_counts = []
+
         for lambda_ in lambdas:
             mse_rr_folds = []
             mse_svr_folds = []
+            sv_count = 0
 
             for train_index, test_index in kf.split(X):
                 X_train, X_test = X[train_index], X[test_index]
@@ -280,13 +384,81 @@ if __name__ == "__main__":
                 pred_svr = model_svr.fit(X_train, y_train).predict(X_test)
                 mse_svr_folds.append(mean_squared_error(y_test, pred_svr))
 
-        mse_
+                sv_count += len(model_svr.support_vectors())
+
+            rr_cv_scores.append(np.mean(mse_rr_folds))
+            svr_cv_scores.append(np.mean(mse_svr_folds))
+            svr_cv_sv_counts.append(sv_count / k)
+
+        mse_cv_RR.append(min(rr_cv_scores))
+        mse_cv_SVR.append(min(svr_cv_scores))
+        sv_cv_rbf.append(svr_cv_sv_counts[np.argmin(svr_cv_scores)])
+
+    # Plot 
+    fig, ax = plt.subplots(2, 2, figsize=(12, 8))
+
+    # --- Ridge Regression - Polynomial Kernel ---
+    ax[0, 0].plot(Ms, mse_RR_pol, label=r"$\lambda = 1$")
+    ax[0, 0].plot(Ms, mse_cv_RR_pol, label=r"$\lambda$ chosen with CV")
+    ax[0, 0].set_ylabel("MSE", rotation=0, labelpad=15)
+    ax[0, 0].set_xlabel("Degree")
+    ax[0, 0].set_yscale("log")
+    ax[0, 0].legend()
+    ax[0, 0].set_title("Ridge Regression - Polynomial Kernel")
+    ax[0, 0].grid(True)
+    ax[0, 0].yaxis.set_label_position('left')
+
+    # --- SVR - Polynomial Kernel ---
+    ax[0, 1].plot(Ms, mse_SVR_pol, label=r"$\lambda = 1$")
+    ax[0, 1].plot(Ms, mse_cv_SVR_pol, label=r"$\lambda$ chosen with CV")
+    ax[0, 1].set_ylabel("MSE", rotation=0, labelpad=15)
+    ax[0, 1].set_xlabel("Degree")
+    ax[0, 1].set_yscale("log")
+    ax[0, 1].legend()
+    ax[0, 1].set_title("SVR - Polynomial Kernel")
+    ax[0, 1].grid(True)
+    ax[0, 1].yaxis.set_label_position('left')
+
+    # Annotate support vectors on SVR Polynomial Kernel plot
+    for i, M in enumerate(Ms):
+        ax[0, 1].text(M, mse_SVR_pol[i] * 1.15, f"{sv_pol[i]:.0f}", ha='center', va='bottom', fontsize=8, color='blue')
+        ax[0, 1].text(M, mse_cv_SVR_pol[i] * 0.85, f"{sv_cv_pol[i]:.0f}", ha='center', va='top', fontsize=8, color='orange')
+
+    # --- Ridge Regression - RBF Kernel ---
+    ax[1, 0].plot(sigmas, mse_RR, label=r"$\lambda = 1$")
+    ax[1, 0].plot(sigmas, mse_cv_RR, label=r"$\lambda$ chosen with CV")
+    ax[1, 0].set_ylabel("MSE", rotation=0, labelpad=15)
+    ax[1, 0].set_xlabel("Sigma")
+    ax[1, 0].set_xscale('log')
+    ax[1, 0].legend()
+    ax[1, 0].set_title("Ridge Regression - RBF Kernel")
+    ax[1, 0].grid(True)
+    ax[1, 0].yaxis.set_label_position('left')
+
+    # --- SVR - RBF Kernel ---
+    ax[1, 1].plot(sigmas, mse_SVR, label=r"$\lambda = 1$")
+    ax[1, 1].plot(sigmas, mse_cv_SVR, label=r"$\lambda$ chosen with CV")
+    ax[1, 1].set_ylabel("MSE", rotation=0, labelpad=15)
+    ax[1, 1].set_xlabel("Sigma")
+    ax[1, 1].set_xscale('log')
+    ax[1, 1].legend()
+    ax[1, 1].set_title("SVR - RBF Kernel")
+    ax[1, 1].grid(True)
+    ax[1, 1].yaxis.set_label_position('left')
+
+    # Annotate support vectors on SVR RBF Kernel plot
+    for i, sigma in enumerate(sigmas):
+        ax[1, 1].text(sigma, mse_SVR[i] * 1.02, f"{round(sv_rbf[i]):.0f}", ha='center', va='bottom', fontsize=8, color='blue')
+        ax[1, 1].text(sigma, mse_cv_SVR[i] * 0.985, f"{round(sv_cv_rbf[i]):.0f}", ha='center', va='top', fontsize=8, color='orange')
 
 
-    plt.xscale('log')
-    plt.plot(sigmas, mse_RR, label = "Ridge Regressoin")
-    plt.plot(sigmas,mse_SVR, label = "SVR")
-    plt.xlabel("sigma")
-    plt.ylabel("MSE")
-    plt.legend()
+    # Layout adjustments
+    plt.subplots_adjust(hspace=0.3, wspace=0.3)
+    plt.tight_layout(rect=[0, 0, 1, 0.96])
+
     plt.show()
+
+
+
+
+
