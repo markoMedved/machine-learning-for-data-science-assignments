@@ -204,7 +204,7 @@ if __name__ == "__main__":
     ax[0, 1].legend()
 
     # --- SVR with Polynomial ---
-    svr_poly = SVR(Polynomial(M=3), epsilon=0.1, lambda_=0.1)
+    svr_poly = SVR(Polynomial(M=5), epsilon=0.1, lambda_=1)
     model_poly_svr = svr_poly.fit(X, y)
     pred_poly_svr = model_poly_svr.predict(X)
     sv_indices_poly = svr_poly.support_vectors()
@@ -219,7 +219,7 @@ if __name__ == "__main__":
     ax[1, 0].legend()
 
     # --- Kernel Ridge with Polynomial ---
-    rr_poly = KernelizedRidgeRegression(Polynomial(M=3), lambda_=0.1)
+    rr_poly = KernelizedRidgeRegression(Polynomial(M=5), lambda_=1)
     model_poly_rr = rr_poly.fit(X, y)
     pred_poly_rr = model_poly_rr.predict(X)
 
