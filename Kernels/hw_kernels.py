@@ -7,8 +7,11 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import KFold
 
+# TODO part 1 scale the data - look also at the constraint for alphas
+# TODO part 2 scale the data seperately
 # TODO epsilon setting for part 2
-# TODO: part 3
+# TODO: part 3 loook at the definition of a  kernel, for the baseline you can use SVM with any kernel with pixels as inputs
+
 
 
 class Linear:
@@ -142,8 +145,9 @@ class SVR:
     def support_vectors(self, threshold=1e-5):
         C = 1 / (self.lambda_ + 1e-10)
         support_vector_indices = np.where(
-            ((self.alphas > threshold) & (self.alphas < C - threshold)) |
-            ((self.alphas_star > threshold) & (self.alphas_star < C - threshold))
+            (((self.alphas > threshold) & (self.alphas < C - threshold)) |
+            ((self.alphas_star > threshold) & (self.alphas_star < C - threshold)) )#&
+            #(self.alphas - self.alphas_star > 0)
         )[0]
         return support_vector_indices
     
@@ -172,64 +176,73 @@ if __name__ == "__main__":
     # PART 1 
     #################################
 
-    sine = pd.read_csv("sine.csv")
-    X = sine["x"].values.reshape(-1, 1)
-    y = sine["y"].values
+    # sine = pd.read_csv("sine.csv")
+    # X = sine["x"].values.reshape(-1, 1)
+    # scaler = StandardScaler()
+    # y = sine["y"].values
 
-    fig, ax = plt.subplots(2, 2, figsize=(12, 8))
+    # fig, ax = plt.subplots(2, 2, figsize=(12, 8))
 
-    # --- SVR with RBF ---
-    svr_rbf = SVR(RBF(sigma=1), epsilon=0.1, lambda_=0.1)
-    model_rbf_svr = svr_rbf.fit(X, y)
-    pred_rbf_svr = model_rbf_svr.predict(X)
-    sv_indices_rbf = svr_rbf.support_vectors()
+    # # --- SVR with RBF ---
+    # svr_rbf = SVR(RBF(sigma=1), epsilon=0.5, lambda_=0.001)
+    # model_rbf_svr = svr_rbf.fit(X, y)
+    # pred_rbf_svr = model_rbf_svr.predict(X)
+    # sv_indices_rbf = svr_rbf.support_vectors()
 
-    ax[0, 0].scatter(X[~np.isin(np.arange(len(X)), sv_indices_rbf)], 
-                    y[~np.isin(np.arange(len(X)), sv_indices_rbf)], 
-                    color='lightblue', label="Non-Support Vectors")
-    ax[0, 0].scatter(X[sv_indices_rbf], y[sv_indices_rbf], 
-                    color='lightblue', edgecolor='black', label="Support Vectors")
-    ax[0, 0].scatter(X, pred_rbf_svr, color='orange', label="Prediction")
-    ax[0, 0].set_title("SVR - RBF Kernel")
-    ax[0, 0].legend()
+    # ax[0, 0].scatter(X[~np.isin(np.arange(len(X)), sv_indices_rbf)], 
+    #                 y[~np.isin(np.arange(len(X)), sv_indices_rbf)], 
+    #                 color='lightblue', label="Non-Support Vectors")
+    # ax[0, 0].scatter(X[sv_indices_rbf], y[sv_indices_rbf], 
+    #                 color='lightblue', edgecolor='black', label="Support Vectors")
+    # ax[0, 0].scatter(X, pred_rbf_svr, color='orange', label="Prediction")
+    # ax[0, 0].set_title("SVR - RBF Kernel")
+    # ax[0, 0].legend()
 
-    # --- Kernel Ridge with RBF ---
-    rr_rbf = KernelizedRidgeRegression(RBF(sigma=1), lambda_=0.1)
-    model_rbf_rr = rr_rbf.fit(X, y)
-    pred_rbf_rr = model_rbf_rr.predict(X)
+    # # --- Kernel Ridge with RBF ---
+    # rr_rbf = KernelizedRidgeRegression(RBF(sigma=1), lambda_=0.01)
+    # model_rbf_rr = rr_rbf.fit(X, y)
+    # pred_rbf_rr = model_rbf_rr.predict(X)
 
-    ax[0, 1].scatter(X, y, label="Data", color='lightblue')
-    ax[0, 1].scatter(X, pred_rbf_rr, label="Prediction", color='orange')
-    ax[0, 1].set_title("Ridge Regression - RBF Kernel")
-    ax[0, 1].legend()
+    # ax[0, 1].scatter(X, y, label="Data", color='lightblue')
+    # ax[0, 1].scatter(X, pred_rbf_rr, label="Prediction", color='orange')
+    # ax[0, 1].set_title("Ridge Regression - RBF Kernel")
+    # ax[0, 1].legend()
 
-    # --- SVR with Polynomial ---
-    svr_poly = SVR(Polynomial(M=5), epsilon=0.1, lambda_=1)
-    model_poly_svr = svr_poly.fit(X, y)
-    pred_poly_svr = model_poly_svr.predict(X)
-    sv_indices_poly = svr_poly.support_vectors()
+    # X = scaler.fit_transform(X)
 
-    ax[1, 0].scatter(X[~np.isin(np.arange(len(X)), sv_indices_poly)], 
-                    y[~np.isin(np.arange(len(X)), sv_indices_poly)], 
-                    color='lightblue', label="Non-Support Vectors")
-    ax[1, 0].scatter(X[sv_indices_poly], y[sv_indices_poly], 
-                    color='lightblue', edgecolor='black', label="Support Vectors")
-    ax[1, 0].scatter(X, pred_poly_svr, color='orange', label="Prediction")
-    ax[1, 0].set_title("SVR - Polynomial Kernel")
-    ax[1, 0].legend()
+    # # --- SVR with Polynomial ---
+    # svr_poly = SVR(Polynomial(M=10), epsilon=0.1, lambda_=0.001)
+    # model_poly_svr = svr_poly.fit(X, y)
+    # pred_poly_svr = model_poly_svr.predict(X)
+    # sv_indices_poly = svr_poly.support_vectors()
 
-    # --- Kernel Ridge with Polynomial ---
-    rr_poly = KernelizedRidgeRegression(Polynomial(M=5), lambda_=1)
-    model_poly_rr = rr_poly.fit(X, y)
-    pred_poly_rr = model_poly_rr.predict(X)
+    # X = scaler.inverse_transform(X)
 
-    ax[1, 1].scatter(X, y, label="Data", color='lightblue')
-    ax[1, 1].scatter(X, pred_poly_rr, label="Prediction", color='orange')
-    ax[1, 1].set_title("Ridge Regression - Polynomial Kernel")
-    ax[1, 1].legend()
+    # ax[1, 0].scatter(X[~np.isin(np.arange(len(X)), sv_indices_poly)], 
+    #                 y[~np.isin(np.arange(len(X)), sv_indices_poly)], 
+    #                 color='lightblue', label="Non-Support Vectors")
+    # ax[1, 0].scatter(X[sv_indices_poly], y[sv_indices_poly], 
+    #                 color='lightblue', edgecolor='black', label="Support Vectors")
+    # ax[1, 0].scatter(X, pred_poly_svr, color='orange', label="Prediction")
+    # ax[1, 0].set_title("SVR - Polynomial Kernel")
+    # ax[1, 0].legend()
 
-    plt.tight_layout()
-    plt.show()
+    # X = scaler.fit_transform(X)
+
+    # # --- Kernel Ridge with Polynomial ---
+    # rr_poly = KernelizedRidgeRegression(Polynomial(M=10), lambda_=0.001)
+    # model_poly_rr = rr_poly.fit(X, y)
+    # pred_poly_rr = model_poly_rr.predict(X)
+
+    # X = scaler.inverse_transform(X)
+
+    # ax[1, 1].scatter(X, y, label="Data", color='lightblue')
+    # ax[1, 1].scatter(X, pred_poly_rr, label="Prediction", color='orange')
+    # ax[1, 1].set_title("Ridge Regression - Polynomial Kernel")
+    # ax[1, 1].legend()
+
+    # plt.tight_layout()
+    # plt.show()
 
     ########################################
     ## PART2
