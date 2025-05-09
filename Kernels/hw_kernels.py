@@ -235,171 +235,286 @@ if __name__ == "__main__":
     ## PART2
     #########################################
 
-    # Housing data 
-    df = pd.read_csv("housing2r.csv")
-    y = df["y"].values
-    X = df.drop(columns=["y"]).values
+    # # Housing data 
+    # df = pd.read_csv("housing2r.csv")
+    # y = df["y"].values
+    # X = df.drop(columns=["y"]).values
 
-    scaler = StandardScaler()
-    X = scaler.fit_transform(X)
+    # scaler = StandardScaler()
+    # X = scaler.fit_transform(X)
 
-    k = 10
-    kf = KFold(k, shuffle=True, random_state=42)
+    # k = 10
+    # kf = KFold(k, shuffle=True, random_state=42)
+    # k_innter = 6
+    # kf_inner = KFold(k_innter, shuffle=True, random_state=42)
 
-    Ms = np.arange(1,11)
-    lambdas = [0.001, 0.01, 0.1, 1, 10, 100]
+    # Ms = np.arange(1,11)
+    # lambdas = [0.001, 0.01, 0.1, 1, 10, 100]
 
-    mse_RR_pol = []
-    mse_cv_RR_pol = []
-    mse_SVR_pol = []
-    mse_cv_SVR_pol = []
+    # mse_RR_pol = []
+    # std_RR_pol = []
+    # mse_cv_RR_pol = []
+    # std_cv_RR_pol = []
 
-    sv_pol = []
-    sv_cv_pol = []
+    # mse_SVR_pol = []
+    # std_SVR_pol = []
+    # mse_cv_SVR_pol = []
+    # std_cv_SVR_pol = []
+
+    # sv_pol = []
+    # sv_cv_pol = []
 
 
-    # Polynomial
-    for M in Ms:
-        mse_SVR_tmp = []
-        mse_RR_tmp = []
-        sv = 0
-        # lambda = 1
-        for train_index, test_index in kf.split(X):
-            X_train, X_test = X[train_index], X[test_index]
-            y_train, y_test = y[train_index], y[test_index]
+    # # Polynomial
+    # for M in Ms:
+    #     print(M)
+    #     mse_SVR_tmp = []
+    #     mse_RR_tmp = []
+    #     sv = 0
+    #     # lambda = 1
+    #     for train_index, test_index in kf.split(X):
+    #         X_train, X_test = X[train_index], X[test_index]
+    #         y_train, y_test = y[train_index], y[test_index]
 
-            fitter = KernelizedRidgeRegression(kernel=Polynomial(M=M), lambda_=1)
-            model = fitter.fit(X_train,y_train)
-            preds = model.predict(X_test)
-            mse_RR_tmp.append(mean_squared_error(y_test, preds))
+    #         fitter = KernelizedRidgeRegression(kernel=Polynomial(M=M), lambda_=1)
+    #         model = fitter.fit(X_train,y_train)
+    #         preds = model.predict(X_test)
+    #         mse_RR_tmp.append(mean_squared_error(y_test, preds))
 
-            fitter = SVR(kernel=Polynomial(M=M), lambda_=1, epsilon=0.1) # TODO set epsilon
-            model = fitter.fit(X_train,y_train)
-            preds = model.predict(X_test)
-            mse_SVR_tmp.append(mean_squared_error(y_test, preds))
+    #         fitter = SVR(kernel=Polynomial(M=M), lambda_=1, epsilon=0.1) 
+    #         model = fitter.fit(X_train,y_train)
+    #         preds = model.predict(X_test)
+    #         mse_SVR_tmp.append(mean_squared_error(y_test, preds))
 
-            sv += len(fitter.support_vectors())
+    #         sv += len(fitter.support_vectors())
         
-        # Average support vectors in the split
-        sv /= k
-        sv_pol.append(sv)
+    #     # Average support vectors in the split
+    #     sv /= k
+    #     sv_pol.append(sv)
 
-        mse_RR_pol.append(np.mean(mse_RR_tmp))
-        mse_SVR_pol.append(np.mean(mse_SVR_tmp))
+    #     mse_RR_pol.append(np.mean(mse_RR_tmp))
+    #     std_RR_pol.append(np.std(mse_RR_tmp) / np.sqrt(k))
+    #     mse_SVR_pol.append(np.mean(mse_SVR_tmp))
+    #     std_SVR_pol.append(np.std(mse_SVR_tmp) / np.sqrt(k))
 
-        # Cross validation
-        rr_cv_scores = []
-        svr_cv_scores = []
-        svr_cv_sv_counts = []
+    #     # Cross validation
+    #     best_rr_mses, best_svr_mses, best_svr_sv_counts = [], [], []
 
-        
-        for lambda_ in lambdas:
-            mse_rr_lmbd, mse_svr_lmbd = [], []
-            sv_count = 0
+    #     for train_idx, test_idx in kf.split(X):
+    #         X_train_outer, X_test_outer = X[train_idx], X[test_idx]
+    #         y_train_outer, y_test_outer = y[train_idx], y[test_idx]
 
-            for train_index, test_index in kf.split(X):
-                X_train, X_test = X[train_index], X[test_index]
-                y_train, y_test = y[train_index], y[test_index]
+    #         best_rr_mse, best_svr_mse = float("inf"), float("inf")
+    #         best_sv_count = 0
 
-                rr = KernelizedRidgeRegression(kernel=Polynomial(M=M), lambda_=lambda_)
-                svr = SVR(kernel=Polynomial(M=M), lambda_=lambda_, epsilon=0.1)
+    #         for lambda_ in lambdas:
+    #             rr_mses, svr_mses, svr_svs = [], [], []
 
-                pred_rr = rr.fit(X_train, y_train).predict(X_test)
-                pred_svr = svr.fit(X_train, y_train).predict(X_test)
+    #             for inner_train_idx, inner_val_idx in kf_inner.split(X_train_outer):
+    #                 X_train, X_val = X_train_outer[inner_train_idx], X_train_outer[inner_val_idx]
+    #                 y_train, y_val = y_train_outer[inner_train_idx], y_train_outer[inner_val_idx]
 
-                mse_rr_lmbd.append(mean_squared_error(y_test, pred_rr))
-                mse_svr_lmbd.append(mean_squared_error(y_test, pred_svr))
+    #                 # RR
+    #                 rr = KernelizedRidgeRegression(kernel=Polynomial(M=M), lambda_=lambda_)
+    #                 pred_rr = rr.fit(X_train, y_train).predict(X_val)
+    #                 rr_mses.append(mean_squared_error(y_val, pred_rr))
 
-                sv_count += len(svr.support_vectors())
+    #                 # SVR
+    #                 svr = SVR(kernel=Polynomial(M=M), lambda_=lambda_, epsilon=0.1)
+    #                 pred_svr = svr.fit(X_train, y_train).predict(X_val)
+    #                 svr_mses.append(mean_squared_error(y_val, pred_svr))
+    #                 svr_svs.append(len(svr.support_vectors()))
 
-            rr_cv_scores.append(np.mean(mse_rr_lmbd))
-            svr_cv_scores.append(np.mean(mse_svr_lmbd))
-            svr_cv_sv_counts.append(sv_count / k)  # avg over folds
+    #             rr_avg = np.mean(rr_mses)
+    #             svr_avg = np.mean(svr_mses)
+    #             sv_avg = np.mean(svr_svs)
 
-        mse_cv_RR_pol.append(min(rr_cv_scores))
-        mse_cv_SVR_pol.append(min(svr_cv_scores))
+    #             if rr_avg < best_rr_mse:
+    #                 best_rr_mse = rr_avg
+    #                 best_rr_lambda = lambda_
 
-        # Get support vector count corresponding to best lambda for SVR
-        best_lambda_idx = np.argmin(svr_cv_scores)
-        sv_cv_pol.append(svr_cv_sv_counts[best_lambda_idx])
+    #             if svr_avg < best_svr_mse:
+    #                 best_svr_mse = svr_avg
+    #                 best_svr_lambda = lambda_
+    #                 best_sv_count = sv_avg
+
+    #         # Retrain on full outer train set with best lambda
+    #         final_rr = KernelizedRidgeRegression(kernel=Polynomial(M=M), lambda_=best_rr_lambda)
+    #         final_svr = SVR(kernel=Polynomial(M=M), lambda_=best_svr_lambda, epsilon=0.1)
+
+    #         best_rr_mses.append(mean_squared_error(y_test_outer, final_rr.fit(X_train_outer, y_train_outer).predict(X_test_outer)))
+    #         best_svr_mses.append(mean_squared_error(y_test_outer, final_svr.fit(X_train_outer, y_train_outer).predict(X_test_outer)))
+    #         best_svr_sv_counts.append(best_sv_count)
+
+    #     mse_cv_RR_pol.append(np.mean(best_rr_mses))
+    #     std_cv_RR_pol.append(np.std(best_rr_mses) / np.sqrt(k))
+
+    #     mse_cv_SVR_pol.append(np.mean(best_svr_mses))
+    #     std_cv_SVR_pol.append(np.std(best_svr_mses) / np.sqrt(k))
+
+    #     sv_cv_pol.append(np.mean(best_svr_sv_counts))
+
+    # np.save("mse_RR_pol.npy", mse_RR_pol)
+    # np.save("std_RR_pol.npy", std_RR_pol)
+
+    # np.save("mse_cv_RR_pol.npy", mse_cv_RR_pol)
+    # np.save("std_cv_RR_pol.npy", std_cv_RR_pol)
+
+    # np.save("mse_SVR_pol.npy", mse_SVR_pol)
+    # np.save("std_SVR_pol.npy", std_SVR_pol)
+
+    # np.save("mse_cv_SVR_pol.npy", mse_cv_SVR_pol)
+    # np.save("std_cv_SVR_pol.npy", std_cv_SVR_pol)
+
+    # np.save("sv_pol.npy", sv_pol)
+    # np.save("sv_cv_pol.npy", sv_cv_pol)
 
 
-    # RBF
-    mse_RR = []
-    mse_cv_RR = []
-    mse_SVR = []
-    mse_cv_SVR = []
-    sv_rbf = []         # Support vectors for lambda=1
-    sv_cv_rbf = []      # Support vectors for best lambda (CV)
 
+    # # RBF
+    # mse_RR = []
+    # std_RR = []
+    # mse_cv_RR = []
+    # std_cv_RR = []
+
+    # mse_SVR = []
+    # std_SVR = []
+    # mse_cv_SVR = []
+    # std_cv_SVR = []
+
+    # sv_rbf = []         
+    # sv_cv_rbf = []     
+
+    # sigmas = [0.001, 0.01, 0.1, 1, 2, 3, 4, 5, 8, 10, 100]
+
+    # for sigma in sigmas:
+    #     print(sigma)
+    #     mse_SVR_tmp = []
+    #     mse_RR_tmp = []
+    #     sv = 0
+
+    #     # lambda = 1
+    #     for train_index, test_index in kf.split(X):
+    #         X_train, X_test = X[train_index], X[test_index]
+    #         y_train, y_test = y[train_index], y[test_index]
+
+    #         fitter = KernelizedRidgeRegression(kernel=RBF(sigma=sigma), lambda_=1)
+    #         model = fitter.fit(X_train, y_train)
+    #         preds = model.predict(X_test)
+    #         mse_RR_tmp.append(mean_squared_error(y_test, preds))
+
+    #         fitter = SVR(kernel=RBF(sigma=sigma), lambda_=1, epsilon=0.1)
+    #         model = fitter.fit(X_train, y_train)
+    #         preds = model.predict(X_test)
+    #         mse_SVR_tmp.append(mean_squared_error(y_test, preds))
+
+    #         sv += len(fitter.support_vectors())
+
+    #     mse_RR.append(np.mean(mse_RR_tmp))
+    #     std_RR.append(np.std(mse_RR_tmp) / np.sqrt(k))
+    #     mse_SVR.append(np.mean(mse_SVR_tmp))
+    #     std_SVR.append(np.std(mse_SVR_tmp) / np.sqrt(k))
+    #     sv_rbf.append(sv / k)
+
+    #     # Cross validation
+    #     best_rr_mses, best_svr_mses, best_svr_sv_counts = [], [], []
+
+    #     for outer_train_idx, outer_test_idx in kf.split(X):
+    #         X_train_outer, X_test_outer = X[outer_train_idx], X[outer_test_idx]
+    #         y_train_outer, y_test_outer = y[outer_train_idx], y[outer_test_idx]
+
+    #         best_rr_mse, best_svr_mse = float("inf"), float("inf")
+    #         best_rr_lambda = best_svr_lambda = None
+    #         best_sv_count = 0
+
+    #         for lambda_ in lambdas:
+    #             rr_mses, svr_mses, svr_svs = [], [], []
+
+    #             for inner_train_idx, inner_val_idx in kf_inner.split(X_train_outer):
+    #                 X_train, X_val = X_train_outer[inner_train_idx], X_train_outer[inner_val_idx]
+    #                 y_train, y_val = y_train_outer[inner_train_idx], y_train_outer[inner_val_idx]
+
+    #                 # RR
+    #                 rr = KernelizedRidgeRegression(kernel=RBF(sigma=sigma), lambda_=lambda_)
+    #                 pred_rr = rr.fit(X_train, y_train).predict(X_val)
+    #                 rr_mses.append(mean_squared_error(y_val, pred_rr))
+
+    #                 # SVR
+    #                 svr = SVR(kernel=RBF(sigma=sigma), lambda_=lambda_, epsilon=0.1)
+    #                 pred_svr = svr.fit(X_train, y_train).predict(X_val)
+    #                 svr_mses.append(mean_squared_error(y_val, pred_svr))
+    #                 svr_svs.append(len(svr.support_vectors()))
+
+    #             mean_rr, mean_svr, mean_sv = np.mean(rr_mses), np.mean(svr_mses), np.mean(svr_svs)
+
+    #             if mean_rr < best_rr_mse:
+    #                 best_rr_mse = mean_rr
+    #                 best_rr_lambda = lambda_
+
+    #             if mean_svr < best_svr_mse:
+    #                 best_svr_mse = mean_svr
+    #                 best_svr_lambda = lambda_
+    #                 best_sv_count = mean_sv
+
+    #         # Train final models with best lambda
+    #         final_rr = KernelizedRidgeRegression(kernel=RBF(sigma=sigma), lambda_=best_rr_lambda)
+    #         final_svr = SVR(kernel=RBF(sigma=sigma), lambda_=best_svr_lambda, epsilon=0.1)
+
+    #         best_rr_mses.append(mean_squared_error(y_test_outer, final_rr.fit(X_train_outer, y_train_outer).predict(X_test_outer)))
+    #         best_svr_mses.append(mean_squared_error(y_test_outer, final_svr.fit(X_train_outer, y_train_outer).predict(X_test_outer)))
+    #         best_svr_sv_counts.append(best_sv_count)
+
+    #     mse_cv_RR.append(np.mean(best_rr_mses))
+    #     std_cv_RR.append(np.std(best_rr_mses) / np.sqrt(k))
+    #     mse_cv_SVR.append(np.mean(best_svr_mses))
+    #     std_cv_SVR.append(np.std(best_svr_mses) / np.sqrt(k))
+    #     sv_cv_rbf.append(np.mean(best_svr_sv_counts))
+
+    # np.save("mse_RR.npy", mse_RR)
+    # np.save("std_RR.npy", std_RR)
+
+    # np.save("mse_cv_RR.npy", mse_cv_RR)
+    # np.save("std_cv_RR.npy", std_cv_RR)
+
+    # np.save("mse_SVR.npy", mse_SVR)
+    # np.save("std_SVR.npy", std_SVR)
+
+    # np.save("mse_cv_SVR.npy", mse_cv_SVR)
+    # np.save("std_cv_SVR.npy", std_cv_SVR)
+
+    # np.save("sv_rbf.npy", sv_rbf)
+    # np.save("sv_cv_rbf.npy", sv_cv_rbf)
+
+    Ms = np.arange(1, 11)
     sigmas = [0.001, 0.01, 0.1, 1, 2, 3, 4, 5, 8, 10, 100]
+    mse_RR_pol = np.load("mse_RR_pol.npy")
+    std_RR_pol = np.load("std_RR_pol.npy")
+    mse_cv_RR_pol = np.load("mse_cv_RR_pol.npy")
+    std_cv_RR_pol = np.load("std_cv_RR_pol.npy")
+    mse_SVR_pol = np.load("mse_SVR_pol.npy")
+    std_SVR_pol = np.load("std_SVR_pol.npy")
+    mse_cv_SVR_pol = np.load("mse_cv_SVR_pol.npy")
+    std_cv_SVR_pol = np.load("std_cv_SVR_pol.npy")
+    sv_pol = np.load("sv_pol.npy")
+    sv_cv_pol = np.load("sv_cv_pol.npy")
+    mse_RR = np.load("mse_RR.npy")
+    std_RR = np.load("std_RR.npy")
+    mse_cv_RR = np.load("mse_cv_RR.npy")
+    std_cv_RR = np.load("std_cv_RR.npy")
+    mse_SVR = np.load("mse_SVR.npy")
+    std_SVR = np.load("std_SVR.npy")
+    mse_cv_SVR = np.load("mse_cv_SVR.npy")
+    std_cv_SVR = np.load("std_cv_SVR.npy")
+    sv_rbf = np.load("sv_rbf.npy")
+    sv_cv_rbf = np.load("sv_cv_rbf.npy")
 
-    for sigma in sigmas:
-        mse_SVR_tmp = []
-        mse_RR_tmp = []
-        sv = 0
 
-        # lambda = 1
-        for train_index, test_index in kf.split(X):
-            X_train, X_test = X[train_index], X[test_index]
-            y_train, y_test = y[train_index], y[test_index]
 
-            fitter = KernelizedRidgeRegression(kernel=RBF(sigma=sigma), lambda_=1)
-            model = fitter.fit(X_train, y_train)
-            preds = model.predict(X_test)
-            mse_RR_tmp.append(mean_squared_error(y_test, preds))
-
-            fitter = SVR(kernel=RBF(sigma=sigma), lambda_=1, epsilon=0.1)
-            model = fitter.fit(X_train, y_train)
-            preds = model.predict(X_test)
-            mse_SVR_tmp.append(mean_squared_error(y_test, preds))
-
-            sv += len(fitter.support_vectors())
-
-        mse_RR.append(np.mean(mse_RR_tmp))
-        mse_SVR.append(np.mean(mse_SVR_tmp))
-        sv_rbf.append(sv / k)
-
-        # Cross validation
-        rr_cv_scores = []
-        svr_cv_scores = []
-        svr_cv_sv_counts = []
-
-        for lambda_ in lambdas:
-            mse_rr_folds = []
-            mse_svr_folds = []
-            sv_count = 0
-
-            for train_index, test_index in kf.split(X):
-                X_train, X_test = X[train_index], X[test_index]
-                y_train, y_test = y[train_index], y[test_index]
-
-                # Ridge Regression
-                model_rr = KernelizedRidgeRegression(kernel=RBF(sigma=sigma), lambda_=lambda_)
-                pred_rr = model_rr.fit(X_train, y_train).predict(X_test)
-                mse_rr_folds.append(mean_squared_error(y_test, pred_rr))
-
-                # SVR
-                model_svr = SVR(kernel=RBF(sigma=sigma), lambda_=lambda_, epsilon=0.1)
-                pred_svr = model_svr.fit(X_train, y_train).predict(X_test)
-                mse_svr_folds.append(mean_squared_error(y_test, pred_svr))
-
-                sv_count += len(model_svr.support_vectors())
-
-            rr_cv_scores.append(np.mean(mse_rr_folds))
-            svr_cv_scores.append(np.mean(mse_svr_folds))
-            svr_cv_sv_counts.append(sv_count / k)
-
-        mse_cv_RR.append(min(rr_cv_scores))
-        mse_cv_SVR.append(min(svr_cv_scores))
-        sv_cv_rbf.append(svr_cv_sv_counts[np.argmin(svr_cv_scores)])
-
-    # Plot 
     fig, ax = plt.subplots(2, 2, figsize=(12, 8))
 
     # --- Ridge Regression - Polynomial Kernel ---
-    ax[0, 0].plot(Ms, mse_RR_pol, label=r"$\lambda = 1$")
-    ax[0, 0].plot(Ms, mse_cv_RR_pol, label=r"$\lambda$ chosen with CV")
+    ax[0, 0].errorbar(Ms, mse_RR_pol, yerr=std_RR_pol, label=r"$\lambda = 1$", fmt='-o', capsize=3)
+    ax[0, 0].errorbar(Ms, mse_cv_RR_pol, yerr=std_cv_RR_pol, label=r"$\lambda$ chosen with CV", fmt='-s', capsize=3)
     ax[0, 0].set_ylabel("MSE", rotation=0, labelpad=15)
     ax[0, 0].set_xlabel("Degree")
     ax[0, 0].set_yscale("log")
@@ -409,8 +524,8 @@ if __name__ == "__main__":
     ax[0, 0].yaxis.set_label_position('left')
 
     # --- SVR - Polynomial Kernel ---
-    ax[0, 1].plot(Ms, mse_SVR_pol, label=r"$\lambda = 1$")
-    ax[0, 1].plot(Ms, mse_cv_SVR_pol, label=r"$\lambda$ chosen with CV")
+    ax[0, 1].errorbar(Ms, mse_SVR_pol, yerr=std_SVR_pol, label=r"$\lambda = 1$", fmt='-o', capsize=3)
+    ax[0, 1].errorbar(Ms, mse_cv_SVR_pol, yerr=std_cv_SVR_pol, label=r"$\lambda$ chosen with CV", fmt='-s', capsize=3)
     ax[0, 1].set_ylabel("MSE", rotation=0, labelpad=15)
     ax[0, 1].set_xlabel("Degree")
     ax[0, 1].set_yscale("log")
@@ -419,14 +534,14 @@ if __name__ == "__main__":
     ax[0, 1].grid(True)
     ax[0, 1].yaxis.set_label_position('left')
 
-    # Annotate support vectors on SVR Polynomial Kernel plot
+    # Annotate support vectors - Polynomial Kernel
     for i, M in enumerate(Ms):
-        ax[0, 1].text(M, mse_SVR_pol[i] * 1.15, f"{sv_pol[i]:.0f}", ha='center', va='bottom', fontsize=8, color='blue')
-        ax[0, 1].text(M, mse_cv_SVR_pol[i] * 0.85, f"{sv_cv_pol[i]:.0f}", ha='center', va='top', fontsize=8, color='orange')
+        ax[0, 1].text(M , mse_SVR_pol[i] * 1.1, f"{sv_pol[i]:.0f}", va='bottom', fontsize=8, color='black')
+        ax[0, 1].text(M, mse_cv_SVR_pol[i] * 0.9, f"{sv_cv_pol[i]:.0f}", va='top', fontsize=8, color='black')
 
     # --- Ridge Regression - RBF Kernel ---
-    ax[1, 0].plot(sigmas, mse_RR, label=r"$\lambda = 1$")
-    ax[1, 0].plot(sigmas, mse_cv_RR, label=r"$\lambda$ chosen with CV")
+    ax[1, 0].errorbar(sigmas, mse_RR, yerr=std_RR, label=r"$\lambda = 1$", fmt='-o', capsize=3)
+    ax[1, 0].errorbar(sigmas, mse_cv_RR, yerr=std_cv_RR, label=r"$\lambda$ chosen with CV", fmt='-s', capsize=3)
     ax[1, 0].set_ylabel("MSE", rotation=0, labelpad=15)
     ax[1, 0].set_xlabel("Sigma")
     ax[1, 0].set_xscale('log')
@@ -436,8 +551,8 @@ if __name__ == "__main__":
     ax[1, 0].yaxis.set_label_position('left')
 
     # --- SVR - RBF Kernel ---
-    ax[1, 1].plot(sigmas, mse_SVR, label=r"$\lambda = 1$")
-    ax[1, 1].plot(sigmas, mse_cv_SVR, label=r"$\lambda$ chosen with CV")
+    ax[1, 1].errorbar(sigmas, mse_SVR, yerr=std_SVR, label=r"$\lambda = 1$", fmt='-o', capsize=3)
+    ax[1, 1].errorbar(sigmas, mse_cv_SVR, yerr=std_cv_SVR, label=r"$\lambda$ chosen with CV", fmt='-s', capsize=3)
     ax[1, 1].set_ylabel("MSE", rotation=0, labelpad=15)
     ax[1, 1].set_xlabel("Sigma")
     ax[1, 1].set_xscale('log')
@@ -446,17 +561,14 @@ if __name__ == "__main__":
     ax[1, 1].grid(True)
     ax[1, 1].yaxis.set_label_position('left')
 
-    # Annotate support vectors on SVR RBF Kernel plot
     for i, sigma in enumerate(sigmas):
-        ax[1, 1].text(sigma, mse_SVR[i] * 1.02, f"{round(sv_rbf[i]):.0f}", ha='center', va='bottom', fontsize=8, color='blue')
-        ax[1, 1].text(sigma, mse_cv_SVR[i] * 0.985, f"{round(sv_cv_rbf[i]):.0f}", ha='center', va='top', fontsize=8, color='orange')
+        ax[1, 1].text(sigma, mse_SVR[i] * 1.05, f"{round(sv_rbf[i]):.0f}", va='bottom', fontsize=8, color='black')
+        ax[1, 1].text(sigma, mse_cv_SVR[i] * 0.95, f"{round(sv_cv_rbf[i]):.0f}", va='top', fontsize=8, color='black')
 
-
-    # Layout adjustments
     plt.subplots_adjust(hspace=0.3, wspace=0.3)
     plt.tight_layout(rect=[0, 0, 1, 0.96])
-
     plt.show()
+
 
 
 
