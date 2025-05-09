@@ -7,7 +7,6 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import KFold
 
-# TODO part 1 scale the data - look also at the constraint for alphas
 # TODO part 2 scale the data seperately
 # TODO epsilon setting for part 2
 # TODO: part 3 loook at the definition of a  kernel, for the baseline you can use SVM with any kernel with pixels as inputs
@@ -145,9 +144,7 @@ class SVR:
     def support_vectors(self, threshold=1e-5):
         C = 1 / (self.lambda_ + 1e-10)
         support_vector_indices = np.where(
-            (((self.alphas > threshold) & (self.alphas < C - threshold)) |
-            ((self.alphas_star > threshold) & (self.alphas_star < C - threshold)) )#&
-            #(self.alphas - self.alphas_star > 0)
+            ((self.alphas - self.alphas_star) > threshold) 
         )[0]
         return support_vector_indices
     
@@ -211,7 +208,7 @@ if __name__ == "__main__":
     # X = scaler.fit_transform(X)
 
     # # --- SVR with Polynomial ---
-    # svr_poly = SVR(Polynomial(M=10), epsilon=0.1, lambda_=0.001)
+    # svr_poly = SVR(Polynomial(M=10), epsilon=0.5, lambda_=0.0001)
     # model_poly_svr = svr_poly.fit(X, y)
     # pred_poly_svr = model_poly_svr.predict(X)
     # sv_indices_poly = svr_poly.support_vectors()
@@ -244,259 +241,265 @@ if __name__ == "__main__":
     # plt.tight_layout()
     # plt.show()
 
+    #######################################
+    # PART2
     ########################################
-    ## PART2
-    #########################################
 
-    # # Housing data 
-    # df = pd.read_csv("housing2r.csv")
-    # y = df["y"].values
-    # X = df.drop(columns=["y"]).values
+    # Housing data 
+    df = pd.read_csv("housing2r.csv")
+    y = df["y"].values
+    X = df.drop(columns=["y"]).values
 
-    # scaler = StandardScaler()
+    scaler = StandardScaler()
     # X = scaler.fit_transform(X)
 
-    # k = 10
-    # kf = KFold(k, shuffle=True, random_state=42)
-    # k_innter = 6
-    # kf_inner = KFold(k_innter, shuffle=True, random_state=42)
+    k = 10
+    kf = KFold(k, shuffle=True, random_state=42)
+    k_innter = 6
+    kf_inner = KFold(k_innter, shuffle=True, random_state=42)
 
-    # Ms = np.arange(1,11)
-    # lambdas = [0.001, 0.01, 0.1, 1, 10, 100]
+    Ms = np.arange(1,11)
+    lambdas = [0.001, 0.01, 0.1, 1, 10, 100]
 
-    # mse_RR_pol = []
-    # std_RR_pol = []
-    # mse_cv_RR_pol = []
-    # std_cv_RR_pol = []
+    mse_RR_pol = []
+    std_RR_pol = []
+    mse_cv_RR_pol = []
+    std_cv_RR_pol = []
 
-    # mse_SVR_pol = []
-    # std_SVR_pol = []
-    # mse_cv_SVR_pol = []
-    # std_cv_SVR_pol = []
+    mse_SVR_pol = []
+    std_SVR_pol = []
+    mse_cv_SVR_pol = []
+    std_cv_SVR_pol = []
 
-    # sv_pol = []
-    # sv_cv_pol = []
+    sv_pol = []
+    sv_cv_pol = []
 
 
-    # # Polynomial
-    # for M in Ms:
-    #     print(M)
-    #     mse_SVR_tmp = []
-    #     mse_RR_tmp = []
-    #     sv = 0
-    #     # lambda = 1
-    #     for train_index, test_index in kf.split(X):
-    #         X_train, X_test = X[train_index], X[test_index]
-    #         y_train, y_test = y[train_index], y[test_index]
+    # Polynomial
+    for M in Ms:
+        print(M)
+        mse_SVR_tmp = []
+        mse_RR_tmp = []
+        sv = 0
+        # lambda = 1
+        for train_index, test_index in kf.split(X):
+            X_train, X_test = X[train_index], X[test_index]
+            X_train = scaler.fit_transform(X_train)
+            X_test = scaler.fit_transform(X_test)
 
-    #         fitter = KernelizedRidgeRegression(kernel=Polynomial(M=M), lambda_=1)
-    #         model = fitter.fit(X_train,y_train)
-    #         preds = model.predict(X_test)
-    #         mse_RR_tmp.append(mean_squared_error(y_test, preds))
+            y_train, y_test = y[train_index], y[test_index]
 
-    #         fitter = SVR(kernel=Polynomial(M=M), lambda_=1, epsilon=0.1) 
-    #         model = fitter.fit(X_train,y_train)
-    #         preds = model.predict(X_test)
-    #         mse_SVR_tmp.append(mean_squared_error(y_test, preds))
+            fitter = KernelizedRidgeRegression(kernel=Polynomial(M=M), lambda_=1)
+            model = fitter.fit(X_train,y_train)
+            preds = model.predict(X_test)
+            mse_RR_tmp.append(mean_squared_error(y_test, preds))
 
-    #         sv += len(fitter.support_vectors())
+            fitter = SVR(kernel=Polynomial(M=M), lambda_=1, epsilon=1) 
+            model = fitter.fit(X_train,y_train)
+            preds = model.predict(X_test)
+            mse_SVR_tmp.append(mean_squared_error(y_test, preds))
+
+            sv += len(fitter.support_vectors())
         
-    #     # Average support vectors in the split
-    #     sv /= k
-    #     sv_pol.append(sv)
+        # Average support vectors in the split
+        sv /= k
+        sv_pol.append(sv)
 
-    #     mse_RR_pol.append(np.mean(mse_RR_tmp))
-    #     std_RR_pol.append(np.std(mse_RR_tmp) / np.sqrt(k))
-    #     mse_SVR_pol.append(np.mean(mse_SVR_tmp))
-    #     std_SVR_pol.append(np.std(mse_SVR_tmp) / np.sqrt(k))
+        mse_RR_pol.append(np.mean(mse_RR_tmp))
+        std_RR_pol.append(np.std(mse_RR_tmp) / np.sqrt(k))
+        mse_SVR_pol.append(np.mean(mse_SVR_tmp))
+        std_SVR_pol.append(np.std(mse_SVR_tmp) / np.sqrt(k))
 
-    #     # Cross validation
-    #     best_rr_mses, best_svr_mses, best_svr_sv_counts = [], [], []
+        # Cross validation
+        best_rr_mses, best_svr_mses, best_svr_sv_counts = [], [], []
 
-    #     for train_idx, test_idx in kf.split(X):
-    #         X_train_outer, X_test_outer = X[train_idx], X[test_idx]
-    #         y_train_outer, y_test_outer = y[train_idx], y[test_idx]
+        for train_idx, test_idx in kf.split(X):
+            X_train_outer, X_test_outer = X[train_idx], X[test_idx]
+            X_train_outer = scaler.fit_transform(X_train_outer)
+            X_test_outer = scaler.fit_transform(X_test_outer)
 
-    #         best_rr_mse, best_svr_mse = float("inf"), float("inf")
-    #         best_sv_count = 0
+            y_train_outer, y_test_outer = y[train_idx], y[test_idx]
 
-    #         for lambda_ in lambdas:
-    #             rr_mses, svr_mses, svr_svs = [], [], []
+            best_rr_mse, best_svr_mse = float("inf"), float("inf")
+            best_sv_count = 0
 
-    #             for inner_train_idx, inner_val_idx in kf_inner.split(X_train_outer):
-    #                 X_train, X_val = X_train_outer[inner_train_idx], X_train_outer[inner_val_idx]
-    #                 y_train, y_val = y_train_outer[inner_train_idx], y_train_outer[inner_val_idx]
+            for lambda_ in lambdas:
+                rr_mses, svr_mses, svr_svs = [], [], []
 
-    #                 # RR
-    #                 rr = KernelizedRidgeRegression(kernel=Polynomial(M=M), lambda_=lambda_)
-    #                 pred_rr = rr.fit(X_train, y_train).predict(X_val)
-    #                 rr_mses.append(mean_squared_error(y_val, pred_rr))
+                for inner_train_idx, inner_val_idx in kf_inner.split(X_train_outer):
+                    X_train, X_val = X_train_outer[inner_train_idx], X_train_outer[inner_val_idx]
+                    y_train, y_val = y_train_outer[inner_train_idx], y_train_outer[inner_val_idx]
 
-    #                 # SVR
-    #                 svr = SVR(kernel=Polynomial(M=M), lambda_=lambda_, epsilon=0.1)
-    #                 pred_svr = svr.fit(X_train, y_train).predict(X_val)
-    #                 svr_mses.append(mean_squared_error(y_val, pred_svr))
-    #                 svr_svs.append(len(svr.support_vectors()))
+                    # RR
+                    rr = KernelizedRidgeRegression(kernel=Polynomial(M=M), lambda_=lambda_)
+                    pred_rr = rr.fit(X_train, y_train).predict(X_val)
+                    rr_mses.append(mean_squared_error(y_val, pred_rr))
 
-    #             rr_avg = np.mean(rr_mses)
-    #             svr_avg = np.mean(svr_mses)
-    #             sv_avg = np.mean(svr_svs)
+                    # SVR
+                    svr = SVR(kernel=Polynomial(M=M), lambda_=lambda_, epsilon=1)
+                    pred_svr = svr.fit(X_train, y_train).predict(X_val)
+                    svr_mses.append(mean_squared_error(y_val, pred_svr))
+                    svr_svs.append(len(svr.support_vectors()))
 
-    #             if rr_avg < best_rr_mse:
-    #                 best_rr_mse = rr_avg
-    #                 best_rr_lambda = lambda_
+                rr_avg = np.mean(rr_mses)
+                svr_avg = np.mean(svr_mses)
+                sv_avg = np.mean(svr_svs)
 
-    #             if svr_avg < best_svr_mse:
-    #                 best_svr_mse = svr_avg
-    #                 best_svr_lambda = lambda_
-    #                 best_sv_count = sv_avg
+                if rr_avg < best_rr_mse:
+                    best_rr_mse = rr_avg
+                    best_rr_lambda = lambda_
 
-    #         # Retrain on full outer train set with best lambda
-    #         final_rr = KernelizedRidgeRegression(kernel=Polynomial(M=M), lambda_=best_rr_lambda)
-    #         final_svr = SVR(kernel=Polynomial(M=M), lambda_=best_svr_lambda, epsilon=0.1)
+                if svr_avg < best_svr_mse:
+                    best_svr_mse = svr_avg
+                    best_svr_lambda = lambda_
+                    best_sv_count = sv_avg
 
-    #         best_rr_mses.append(mean_squared_error(y_test_outer, final_rr.fit(X_train_outer, y_train_outer).predict(X_test_outer)))
-    #         best_svr_mses.append(mean_squared_error(y_test_outer, final_svr.fit(X_train_outer, y_train_outer).predict(X_test_outer)))
-    #         best_svr_sv_counts.append(best_sv_count)
+            # Retrain on full outer train set with best lambda
+            final_rr = KernelizedRidgeRegression(kernel=Polynomial(M=M), lambda_=best_rr_lambda)
+            final_svr = SVR(kernel=Polynomial(M=M), lambda_=best_svr_lambda, epsilon=1)
 
-    #     mse_cv_RR_pol.append(np.mean(best_rr_mses))
-    #     std_cv_RR_pol.append(np.std(best_rr_mses) / np.sqrt(k))
+            best_rr_mses.append(mean_squared_error(y_test_outer, final_rr.fit(X_train_outer, y_train_outer).predict(X_test_outer)))
+            best_svr_mses.append(mean_squared_error(y_test_outer, final_svr.fit(X_train_outer, y_train_outer).predict(X_test_outer)))
+            best_svr_sv_counts.append(best_sv_count)
 
-    #     mse_cv_SVR_pol.append(np.mean(best_svr_mses))
-    #     std_cv_SVR_pol.append(np.std(best_svr_mses) / np.sqrt(k))
+        mse_cv_RR_pol.append(np.mean(best_rr_mses))
+        std_cv_RR_pol.append(np.std(best_rr_mses) / np.sqrt(k))
 
-    #     sv_cv_pol.append(np.mean(best_svr_sv_counts))
+        mse_cv_SVR_pol.append(np.mean(best_svr_mses))
+        std_cv_SVR_pol.append(np.std(best_svr_mses) / np.sqrt(k))
 
-    # np.save("mse_RR_pol.npy", mse_RR_pol)
-    # np.save("std_RR_pol.npy", std_RR_pol)
+        sv_cv_pol.append(np.mean(best_svr_sv_counts))
 
-    # np.save("mse_cv_RR_pol.npy", mse_cv_RR_pol)
-    # np.save("std_cv_RR_pol.npy", std_cv_RR_pol)
+    np.save("mse_RR_pol.npy", mse_RR_pol)
+    np.save("std_RR_pol.npy", std_RR_pol)
 
-    # np.save("mse_SVR_pol.npy", mse_SVR_pol)
-    # np.save("std_SVR_pol.npy", std_SVR_pol)
+    np.save("mse_cv_RR_pol.npy", mse_cv_RR_pol)
+    np.save("std_cv_RR_pol.npy", std_cv_RR_pol)
 
-    # np.save("mse_cv_SVR_pol.npy", mse_cv_SVR_pol)
-    # np.save("std_cv_SVR_pol.npy", std_cv_SVR_pol)
+    np.save("mse_SVR_pol.npy", mse_SVR_pol)
+    np.save("std_SVR_pol.npy", std_SVR_pol)
 
-    # np.save("sv_pol.npy", sv_pol)
-    # np.save("sv_cv_pol.npy", sv_cv_pol)
+    np.save("mse_cv_SVR_pol.npy", mse_cv_SVR_pol)
+    np.save("std_cv_SVR_pol.npy", std_cv_SVR_pol)
+
+    np.save("sv_pol.npy", sv_pol)
+    np.save("sv_cv_pol.npy", sv_cv_pol)
 
 
 
-    # # RBF
-    # mse_RR = []
-    # std_RR = []
-    # mse_cv_RR = []
-    # std_cv_RR = []
+    # RBF
+    mse_RR = []
+    std_RR = []
+    mse_cv_RR = []
+    std_cv_RR = []
 
-    # mse_SVR = []
-    # std_SVR = []
-    # mse_cv_SVR = []
-    # std_cv_SVR = []
+    mse_SVR = []
+    std_SVR = []
+    mse_cv_SVR = []
+    std_cv_SVR = []
 
-    # sv_rbf = []         
-    # sv_cv_rbf = []     
+    sv_rbf = []         
+    sv_cv_rbf = []     
 
-    # sigmas = [0.001, 0.01, 0.1, 1, 2, 3, 4, 5, 8, 10, 100]
+    sigmas = [0.001, 0.01, 0.1, 1, 2, 3, 4, 5, 8, 10, 100]
 
-    # for sigma in sigmas:
-    #     print(sigma)
-    #     mse_SVR_tmp = []
-    #     mse_RR_tmp = []
-    #     sv = 0
+    for sigma in sigmas:
+        print(sigma)
+        mse_SVR_tmp = []
+        mse_RR_tmp = []
+        sv = 0
 
-    #     # lambda = 1
-    #     for train_index, test_index in kf.split(X):
-    #         X_train, X_test = X[train_index], X[test_index]
-    #         y_train, y_test = y[train_index], y[test_index]
+        # lambda = 1
+        for train_index, test_index in kf.split(X):
+            X_train, X_test = X[train_index], X[test_index]
+            y_train, y_test = y[train_index], y[test_index]
 
-    #         fitter = KernelizedRidgeRegression(kernel=RBF(sigma=sigma), lambda_=1)
-    #         model = fitter.fit(X_train, y_train)
-    #         preds = model.predict(X_test)
-    #         mse_RR_tmp.append(mean_squared_error(y_test, preds))
+            fitter = KernelizedRidgeRegression(kernel=RBF(sigma=sigma), lambda_=1)
+            model = fitter.fit(X_train, y_train)
+            preds = model.predict(X_test)
+            mse_RR_tmp.append(mean_squared_error(y_test, preds))
 
-    #         fitter = SVR(kernel=RBF(sigma=sigma), lambda_=1, epsilon=0.1)
-    #         model = fitter.fit(X_train, y_train)
-    #         preds = model.predict(X_test)
-    #         mse_SVR_tmp.append(mean_squared_error(y_test, preds))
+            fitter = SVR(kernel=RBF(sigma=sigma), lambda_=1, epsilon=1)
+            model = fitter.fit(X_train, y_train)
+            preds = model.predict(X_test)
+            mse_SVR_tmp.append(mean_squared_error(y_test, preds))
 
-    #         sv += len(fitter.support_vectors())
+            sv += len(fitter.support_vectors())
 
-    #     mse_RR.append(np.mean(mse_RR_tmp))
-    #     std_RR.append(np.std(mse_RR_tmp) / np.sqrt(k))
-    #     mse_SVR.append(np.mean(mse_SVR_tmp))
-    #     std_SVR.append(np.std(mse_SVR_tmp) / np.sqrt(k))
-    #     sv_rbf.append(sv / k)
+        mse_RR.append(np.mean(mse_RR_tmp))
+        std_RR.append(np.std(mse_RR_tmp) / np.sqrt(k))
+        mse_SVR.append(np.mean(mse_SVR_tmp))
+        std_SVR.append(np.std(mse_SVR_tmp) / np.sqrt(k))
+        sv_rbf.append(sv / k)
 
-    #     # Cross validation
-    #     best_rr_mses, best_svr_mses, best_svr_sv_counts = [], [], []
+        # Cross validation
+        best_rr_mses, best_svr_mses, best_svr_sv_counts = [], [], []
 
-    #     for outer_train_idx, outer_test_idx in kf.split(X):
-    #         X_train_outer, X_test_outer = X[outer_train_idx], X[outer_test_idx]
-    #         y_train_outer, y_test_outer = y[outer_train_idx], y[outer_test_idx]
+        for outer_train_idx, outer_test_idx in kf.split(X):
+            X_train_outer, X_test_outer = X[outer_train_idx], X[outer_test_idx]
+            y_train_outer, y_test_outer = y[outer_train_idx], y[outer_test_idx]
 
-    #         best_rr_mse, best_svr_mse = float("inf"), float("inf")
-    #         best_rr_lambda = best_svr_lambda = None
-    #         best_sv_count = 0
+            best_rr_mse, best_svr_mse = float("inf"), float("inf")
+            best_rr_lambda = best_svr_lambda = None
+            best_sv_count = 0
 
-    #         for lambda_ in lambdas:
-    #             rr_mses, svr_mses, svr_svs = [], [], []
+            for lambda_ in lambdas:
+                rr_mses, svr_mses, svr_svs = [], [], []
 
-    #             for inner_train_idx, inner_val_idx in kf_inner.split(X_train_outer):
-    #                 X_train, X_val = X_train_outer[inner_train_idx], X_train_outer[inner_val_idx]
-    #                 y_train, y_val = y_train_outer[inner_train_idx], y_train_outer[inner_val_idx]
+                for inner_train_idx, inner_val_idx in kf_inner.split(X_train_outer):
+                    X_train, X_val = X_train_outer[inner_train_idx], X_train_outer[inner_val_idx]
+                    y_train, y_val = y_train_outer[inner_train_idx], y_train_outer[inner_val_idx]
 
-    #                 # RR
-    #                 rr = KernelizedRidgeRegression(kernel=RBF(sigma=sigma), lambda_=lambda_)
-    #                 pred_rr = rr.fit(X_train, y_train).predict(X_val)
-    #                 rr_mses.append(mean_squared_error(y_val, pred_rr))
+                    # RR
+                    rr = KernelizedRidgeRegression(kernel=RBF(sigma=sigma), lambda_=lambda_)
+                    pred_rr = rr.fit(X_train, y_train).predict(X_val)
+                    rr_mses.append(mean_squared_error(y_val, pred_rr))
 
-    #                 # SVR
-    #                 svr = SVR(kernel=RBF(sigma=sigma), lambda_=lambda_, epsilon=0.1)
-    #                 pred_svr = svr.fit(X_train, y_train).predict(X_val)
-    #                 svr_mses.append(mean_squared_error(y_val, pred_svr))
-    #                 svr_svs.append(len(svr.support_vectors()))
+                    # SVR
+                    svr = SVR(kernel=RBF(sigma=sigma), lambda_=lambda_, epsilon=1)
+                    pred_svr = svr.fit(X_train, y_train).predict(X_val)
+                    svr_mses.append(mean_squared_error(y_val, pred_svr))
+                    svr_svs.append(len(svr.support_vectors()))
 
-    #             mean_rr, mean_svr, mean_sv = np.mean(rr_mses), np.mean(svr_mses), np.mean(svr_svs)
+                mean_rr, mean_svr, mean_sv = np.mean(rr_mses), np.mean(svr_mses), np.mean(svr_svs)
 
-    #             if mean_rr < best_rr_mse:
-    #                 best_rr_mse = mean_rr
-    #                 best_rr_lambda = lambda_
+                if mean_rr < best_rr_mse:
+                    best_rr_mse = mean_rr
+                    best_rr_lambda = lambda_
 
-    #             if mean_svr < best_svr_mse:
-    #                 best_svr_mse = mean_svr
-    #                 best_svr_lambda = lambda_
-    #                 best_sv_count = mean_sv
+                if mean_svr < best_svr_mse:
+                    best_svr_mse = mean_svr
+                    best_svr_lambda = lambda_
+                    best_sv_count = mean_sv
 
-    #         # Train final models with best lambda
-    #         final_rr = KernelizedRidgeRegression(kernel=RBF(sigma=sigma), lambda_=best_rr_lambda)
-    #         final_svr = SVR(kernel=RBF(sigma=sigma), lambda_=best_svr_lambda, epsilon=0.1)
+            # Train final models with best lambda
+            final_rr = KernelizedRidgeRegression(kernel=RBF(sigma=sigma), lambda_=best_rr_lambda)
+            final_svr = SVR(kernel=RBF(sigma=sigma), lambda_=best_svr_lambda, epsilon=1)
 
-    #         best_rr_mses.append(mean_squared_error(y_test_outer, final_rr.fit(X_train_outer, y_train_outer).predict(X_test_outer)))
-    #         best_svr_mses.append(mean_squared_error(y_test_outer, final_svr.fit(X_train_outer, y_train_outer).predict(X_test_outer)))
-    #         best_svr_sv_counts.append(best_sv_count)
+            best_rr_mses.append(mean_squared_error(y_test_outer, final_rr.fit(X_train_outer, y_train_outer).predict(X_test_outer)))
+            best_svr_mses.append(mean_squared_error(y_test_outer, final_svr.fit(X_train_outer, y_train_outer).predict(X_test_outer)))
+            best_svr_sv_counts.append(best_sv_count)
 
-    #     mse_cv_RR.append(np.mean(best_rr_mses))
-    #     std_cv_RR.append(np.std(best_rr_mses) / np.sqrt(k))
-    #     mse_cv_SVR.append(np.mean(best_svr_mses))
-    #     std_cv_SVR.append(np.std(best_svr_mses) / np.sqrt(k))
-    #     sv_cv_rbf.append(np.mean(best_svr_sv_counts))
+        mse_cv_RR.append(np.mean(best_rr_mses))
+        std_cv_RR.append(np.std(best_rr_mses) / np.sqrt(k))
+        mse_cv_SVR.append(np.mean(best_svr_mses))
+        std_cv_SVR.append(np.std(best_svr_mses) / np.sqrt(k))
+        sv_cv_rbf.append(np.mean(best_svr_sv_counts))
 
-    # np.save("mse_RR.npy", mse_RR)
-    # np.save("std_RR.npy", std_RR)
+    np.save("mse_RR.npy", mse_RR)
+    np.save("std_RR.npy", std_RR)
 
-    # np.save("mse_cv_RR.npy", mse_cv_RR)
-    # np.save("std_cv_RR.npy", std_cv_RR)
+    np.save("mse_cv_RR.npy", mse_cv_RR)
+    np.save("std_cv_RR.npy", std_cv_RR)
 
-    # np.save("mse_SVR.npy", mse_SVR)
-    # np.save("std_SVR.npy", std_SVR)
+    np.save("mse_SVR.npy", mse_SVR)
+    np.save("std_SVR.npy", std_SVR)
 
-    # np.save("mse_cv_SVR.npy", mse_cv_SVR)
-    # np.save("std_cv_SVR.npy", std_cv_SVR)
+    np.save("mse_cv_SVR.npy", mse_cv_SVR)
+    np.save("std_cv_SVR.npy", std_cv_SVR)
 
-    # np.save("sv_rbf.npy", sv_rbf)
-    # np.save("sv_cv_rbf.npy", sv_cv_rbf)
+    np.save("sv_rbf.npy", sv_rbf)
+    np.save("sv_cv_rbf.npy", sv_cv_rbf)
 
     Ms = np.arange(1, 11)
     sigmas = [0.001, 0.01, 0.1, 1, 2, 3, 4, 5, 8, 10, 100]
