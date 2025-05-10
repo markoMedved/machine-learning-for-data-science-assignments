@@ -3,3 +3,6 @@ Linear kernel, patch size = 3, lambda = 0.001
 
 Same but patch size = 3
 442.6396384956169
+
+with RBF kernel sigma=1000,patch_size=5,lambda_=0.001
+366.0604778997118
