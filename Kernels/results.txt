@@ -1,0 +1,5 @@
+Linear kernel, patch size = 3, lambda = 0.001
+451.7668211222433
+
+Same but patch size = 3
+442.6396384956169
