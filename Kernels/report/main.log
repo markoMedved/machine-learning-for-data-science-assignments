@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.3.6)  11 MAY 2025 22:48
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.3.6)  11 MAY 2025 23:12
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1142,13 +1142,13 @@ pdfTeX warning (ext4): destination with the same identifier (name{table.1}) has 
                                                   \__shipout_drop_firstpage_...
 l.179 \newpage
                <./figures/part1.png>]
-<figures/part2.png, id=68, 1156.32pt x 578.16pt>
+<figures/part2.png, id=68, 1156.32pt x 722.7pt>
 File: figures/part2.png Graphic file (type png)
 <use figures/part2.png>
-Package pdftex.def Info: figures/part2.png  used on input line 211.
-(pdftex.def)             Requested size: 510.84283pt x 255.41454pt.
+Package pdftex.def Info: figures/part2.png  used on input line 212.
+(pdftex.def)             Requested size: 510.84283pt x 319.26817pt.
 
-Overfull \hbox (258.84283pt too wide) in paragraph at lines 211--212
+Overfull \hbox (258.84283pt too wide) in paragraph at lines 212--213
  [][] 
  []
 
@@ -1156,29 +1156,29 @@ Overfull \hbox (258.84283pt too wide) in paragraph at lines 211--212
 pdfTeX warning (ext4): destination with the same identifier (name{figure.2}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.243  \newpage
+l.244  \newpage
                 <./figures/part2.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 245--249
+Underfull \hbox (badness 10000) in paragraph at lines 246--250
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 250--255
+Underfull \hbox (badness 10000) in paragraph at lines 251--256
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 256--258
+Underfull \hbox (badness 10000) in paragraph at lines 257--259
 
  []
 
 
-Underfull \hbox (badness 3118) in paragraph at lines 259--261
+Underfull \hbox (badness 3118) in paragraph at lines 260--262
 \T1/lmr/m/n/9 val-i-da-tion sets. For eval-u-a-tion, we com-puted the Mean
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 259--261
+Underfull \hbox (badness 10000) in paragraph at lines 260--262
 
  []
 
@@ -1187,7 +1187,7 @@ No file main.bbl.
 pdfTeX warning (ext4): destination with the same identifier (name{table.2}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.285 \end{document}
+l.286 \end{document}
                     
 
 ] (main.aux)
@@ -1207,7 +1207,7 @@ Here is how much of TeX's memory you used:
  1145 hyphenation exceptions out of 8191
  63i,10n,67p,630b,460s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmbx9.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmcsc10.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmex10.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi6.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi8.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi9.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmib10.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr10.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr17.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr6.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr7.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr8.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr9.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmri9.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy6.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy9.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on main.pdf (3 pages, 518849 bytes).
+Output written on main.pdf (3 pages, 535412 bytes).
 PDF statistics:
  168 PDF objects out of 1000 (max. 8388607)
  16 named destinations out of 1000 (max. 500000)

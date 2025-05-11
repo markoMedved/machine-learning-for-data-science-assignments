@@ -244,7 +244,6 @@ if __name__ == "__main__":
     X = df.drop(columns=["y"]).values
 
     scaler = StandardScaler()
-    # X = scaler.fit_transform(X)
 
     k = 10
     kf = KFold(k, shuffle=True, random_state=42)
@@ -526,7 +525,7 @@ if __name__ == "__main__":
 
 
 
-    fig, ax = plt.subplots(2, 2, figsize=(16, 8))
+    fig, ax = plt.subplots(2, 2, figsize=(16, 10))
 
     # --- Ridge Regression - Polynomial Kernel ---
     ax[0, 0].errorbar(Ms, mse_RR_pol, yerr=std_RR_pol, label=r"$\lambda = 1$", fmt='-o', capsize=3)

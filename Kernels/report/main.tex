@@ -202,10 +202,11 @@ To get a somewhat sparse SVR solution, we set \(\epsilon = 5\).
 Figure~\ref{fig:part2} shows the results. Note that with an even larger $\epsilon$ 
 the solution could get even more sparse however then the performance started degrading.
  Note that the numbers above and below the 
-curves indicate the number of support vectors for each configuration.
+curves indicate the number of support vectors (Since we use cross validation, we calculated the 
+average number of support vectors across the splits and rounded it) for each configuration.
 
 
-\vspace{30pt}
+\vspace{20pt}
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.99\textwidth]{figures/part2.png}
