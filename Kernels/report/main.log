@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.3.6)  10 MAY 2025 19:37
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.3.6)  11 MAY 2025 22:48
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1119,15 +1119,15 @@ File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 <figures/part1.png, id=35, 1387.584pt x 704.6325pt>
 File: figures/part1.png Graphic file (type png)
 <use figures/part1.png>
-Package pdftex.def Info: figures/part1.png  used on input line 91.
+Package pdftex.def Info: figures/part1.png  used on input line 92.
 (pdftex.def)             Requested size: 464.39685pt x 235.8195pt.
 
-Overfull \hbox (212.39685pt too wide) in paragraph at lines 91--92
+Overfull \hbox (212.39685pt too wide) in paragraph at lines 92--93
  [][] 
  []
 
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 163.
+(Font)              <8> on input line 164.
 [1{C:/Users/marko/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ec.enc}
 
 
@@ -1135,20 +1135,20 @@ LaTeX Font Info:    External font `lmex10' loaded for size
 pdfTeX warning (ext4): destination with the same identifier (name{figure.1}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.176 \newpage
+l.179 \newpage
               {C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathex.enc}
 pdfTeX warning (ext4): destination with the same identifier (name{table.1}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.176 \newpage
+l.179 \newpage
                <./figures/part1.png>]
 <figures/part2.png, id=68, 1156.32pt x 578.16pt>
 File: figures/part2.png Graphic file (type png)
 <use figures/part2.png>
-Package pdftex.def Info: figures/part2.png  used on input line 206.
+Package pdftex.def Info: figures/part2.png  used on input line 211.
 (pdftex.def)             Requested size: 510.84283pt x 255.41454pt.
 
-Overfull \hbox (258.84283pt too wide) in paragraph at lines 206--207
+Overfull \hbox (258.84283pt too wide) in paragraph at lines 211--212
  [][] 
  []
 
@@ -1156,10 +1156,39 @@ Overfull \hbox (258.84283pt too wide) in paragraph at lines 206--207
 pdfTeX warning (ext4): destination with the same identifier (name{figure.2}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.239  \newpage
+l.243  \newpage
                 <./figures/part2.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 245--249
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 250--255
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 256--258
+
+ []
+
+
+Underfull \hbox (badness 3118) in paragraph at lines 259--261
+\T1/lmr/m/n/9 val-i-da-tion sets. For eval-u-a-tion, we com-puted the Mean
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 259--261
+
+ []
+
 No file main.bbl.
 [3
+pdfTeX warning (ext4): destination with the same identifier (name{table.2}) has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.285 \end{document}
+                    
 
 ] (main.aux)
  ***********
@@ -1170,17 +1199,17 @@ Package rerunfilecheck Info: File `main.out' has not changed.
 (rerunfilecheck)             Checksum: 932C070534277754764CF32F6366C768;1307.
  ) 
 Here is how much of TeX's memory you used:
- 14970 strings out of 474486
- 239632 string characters out of 5743756
+ 14972 strings out of 474486
+ 239648 string characters out of 5743756
  1951542 words of memory out of 5000000
- 36953 multiletter control sequences out of 15000+600000
+ 36954 multiletter control sequences out of 15000+600000
  750577 words of font info for 150 fonts, out of 8000000 for 9000
  1145 hyphenation exceptions out of 8191
  63i,10n,67p,630b,460s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmbx9.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmcsc10.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmex10.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi6.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi8.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi9.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmib10.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr10.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr17.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr6.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr7.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr8.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr9.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmri9.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy6.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy9.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on main.pdf (3 pages, 513776 bytes).
+Output written on main.pdf (3 pages, 518849 bytes).
 PDF statistics:
- 166 PDF objects out of 1000 (max. 8388607)
- 15 named destinations out of 1000 (max. 500000)
+ 168 PDF objects out of 1000 (max. 8388607)
+ 16 named destinations out of 1000 (max. 500000)
  75 words of extra memory for PDF output out of 10000 (max. 10000000)
 

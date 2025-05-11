@@ -165,74 +165,74 @@ if __name__ == "__main__":
     # PART 1 
     #################################
 
-    # sine = pd.read_csv("sine.csv")
-    # X = sine["x"].values.reshape(-1, 1)
-    # scaler = StandardScaler()
-    # y = sine["y"].values
+    sine = pd.read_csv("sine.csv")
+    X = sine["x"].values.reshape(-1, 1)
+    scaler = StandardScaler()
+    y = sine["y"].values
 
-    # fig, ax = plt.subplots(2, 2, figsize=(12, 8))
+    fig, ax = plt.subplots(2, 2, figsize=(12, 8))
 
-    # # --- SVR with RBF ---
-    # svr_rbf = SVR(RBF(sigma=1), epsilon=0.5, lambda_=0.001)
-    # model_rbf_svr = svr_rbf.fit(X, y)
-    # pred_rbf_svr = model_rbf_svr.predict(X)
-    # sv_indices_rbf = svr_rbf.support_vectors()
+    # --- SVR with RBF ---
+    svr_rbf = SVR(RBF(sigma=1), epsilon=0.5, lambda_=0.001)
+    model_rbf_svr = svr_rbf.fit(X, y)
+    pred_rbf_svr = model_rbf_svr.predict(X)
+    sv_indices_rbf = svr_rbf.support_vectors()
 
-    # ax[0, 0].scatter(X[~np.isin(np.arange(len(X)), sv_indices_rbf)], 
-    #                 y[~np.isin(np.arange(len(X)), sv_indices_rbf)], 
-    #                 color='lightblue', label="Non-Support Vectors")
-    # ax[0, 0].scatter(X[sv_indices_rbf], y[sv_indices_rbf], 
-    #                 color='lightblue', edgecolor='black', label="Support Vectors")
-    # ax[0, 0].scatter(X, pred_rbf_svr, color='orange', label="Prediction")
-    # ax[0, 0].set_title("SVR - RBF Kernel", fontsize=18)
-    # ax[0, 0].legend(fontsize=12)
+    ax[0, 0].scatter(X[~np.isin(np.arange(len(X)), sv_indices_rbf)], 
+                    y[~np.isin(np.arange(len(X)), sv_indices_rbf)], 
+                    color='lightblue', label="Non-Support Vectors")
+    ax[0, 0].scatter(X[sv_indices_rbf], y[sv_indices_rbf], 
+                    color='lightblue', edgecolor='black', label="Support Vectors")
+    ax[0, 0].scatter(X, pred_rbf_svr, color='orange', label="Prediction")
+    ax[0, 0].set_title("SVR - RBF Kernel", fontsize=18)
+    ax[0, 0].legend(fontsize=12)
 
-    # # --- Kernel Ridge with RBF ---
-    # rr_rbf = KernelizedRidgeRegression(RBF(sigma=1), lambda_=0.01)
-    # model_rbf_rr = rr_rbf.fit(X, y)
-    # pred_rbf_rr = model_rbf_rr.predict(X)
+    # --- Kernel Ridge with RBF ---
+    rr_rbf = KernelizedRidgeRegression(RBF(sigma=1), lambda_=0.01)
+    model_rbf_rr = rr_rbf.fit(X, y)
+    pred_rbf_rr = model_rbf_rr.predict(X)
 
-    # ax[0, 1].scatter(X, y, label="Data", color='lightblue')
-    # ax[0, 1].scatter(X, pred_rbf_rr, label="Prediction", color='orange')
-    # ax[0, 1].set_title("Ridge Regression - RBF Kernel", fontsize=18)
-    # ax[0, 1].legend(fontsize=12)
+    ax[0, 1].scatter(X, y, label="Data", color='lightblue')
+    ax[0, 1].scatter(X, pred_rbf_rr, label="Prediction", color='orange')
+    ax[0, 1].set_title("Ridge Regression - RBF Kernel", fontsize=18)
+    ax[0, 1].legend(fontsize=12)
 
 
-    # X = scaler.fit_transform(X)
+    X = scaler.fit_transform(X)
 
-    # # --- SVR with Polynomial ---
-    # svr_poly = SVR(Polynomial(M=10), epsilon=0.7, lambda_=0.0001)
-    # model_poly_svr = svr_poly.fit(X, y)
-    # pred_poly_svr = model_poly_svr.predict(X)
-    # sv_indices_poly = svr_poly.support_vectors()
+    # --- SVR with Polynomial ---
+    svr_poly = SVR(Polynomial(M=10), epsilon=0.7, lambda_=0.0001)
+    model_poly_svr = svr_poly.fit(X, y)
+    pred_poly_svr = model_poly_svr.predict(X)
+    sv_indices_poly = svr_poly.support_vectors()
 
-    # X = scaler.inverse_transform(X)
+    X = scaler.inverse_transform(X)
 
-    # ax[1, 0].scatter(X[~np.isin(np.arange(len(X)), sv_indices_poly)], 
-    #                 y[~np.isin(np.arange(len(X)), sv_indices_poly)], 
-    #                 color='lightblue', label="Non-Support Vectors")
-    # ax[1, 0].scatter(X[sv_indices_poly], y[sv_indices_poly], 
-    #                 color='lightblue', edgecolor='black', label="Support Vectors")
-    # ax[1, 0].scatter(X, pred_poly_svr, color='orange', label="Prediction")
-    # ax[1, 0].set_title("SVR - Polynomial Kernel", fontsize=18)
-    # ax[1, 0].legend(fontsize=12)
+    ax[1, 0].scatter(X[~np.isin(np.arange(len(X)), sv_indices_poly)], 
+                    y[~np.isin(np.arange(len(X)), sv_indices_poly)], 
+                    color='lightblue', label="Non-Support Vectors")
+    ax[1, 0].scatter(X[sv_indices_poly], y[sv_indices_poly], 
+                    color='lightblue', edgecolor='black', label="Support Vectors")
+    ax[1, 0].scatter(X, pred_poly_svr, color='orange', label="Prediction")
+    ax[1, 0].set_title("SVR - Polynomial Kernel", fontsize=18)
+    ax[1, 0].legend(fontsize=12)
 
-    # X = scaler.fit_transform(X)
+    X = scaler.fit_transform(X)
 
-    # # --- Kernel Ridge with Polynomial ---
-    # rr_poly = KernelizedRidgeRegression(Polynomial(M=10), lambda_=0.001)
-    # model_poly_rr = rr_poly.fit(X, y)
-    # pred_poly_rr = model_poly_rr.predict(X)
+    # --- Kernel Ridge with Polynomial ---
+    rr_poly = KernelizedRidgeRegression(Polynomial(M=10), lambda_=0.001)
+    model_poly_rr = rr_poly.fit(X, y)
+    pred_poly_rr = model_poly_rr.predict(X)
 
-    # X = scaler.inverse_transform(X)
+    X = scaler.inverse_transform(X)
 
-    # ax[1, 1].scatter(X, y, label="Data", color='lightblue')
-    # ax[1, 1].scatter(X, pred_poly_rr, label="Prediction", color='orange')
-    # ax[1, 1].set_title("Ridge Regression - Polynomial Kernel", fontsize=18)
-    # ax[1, 1].legend(fontsize=12)
+    ax[1, 1].scatter(X, y, label="Data", color='lightblue')
+    ax[1, 1].scatter(X, pred_poly_rr, label="Prediction", color='orange')
+    ax[1, 1].set_title("Ridge Regression - Polynomial Kernel", fontsize=18)
+    ax[1, 1].legend(fontsize=12)
 
-    # plt.tight_layout()
-    # plt.show()
+    plt.tight_layout()
+    plt.show()
 
     #######################################
     # PART2
@@ -287,7 +287,7 @@ if __name__ == "__main__":
             preds = model.predict(X_test)
             mse_RR_tmp.append(mean_squared_error(y_test, preds))
 
-            fitter = SVR(kernel=Polynomial(M=M), lambda_=1, epsilon=.5) 
+            fitter = SVR(kernel=Polynomial(M=M), lambda_=1, epsilon=5) 
             model = fitter.fit(X_train,y_train)
             preds = model.predict(X_test)
             mse_SVR_tmp.append(mean_squared_error(y_test, preds))
@@ -330,7 +330,7 @@ if __name__ == "__main__":
                     rr_mses.append(mean_squared_error(y_val, pred_rr))
 
                     # SVR
-                    svr = SVR(kernel=Polynomial(M=M), lambda_=lambda_, epsilon=.5)
+                    svr = SVR(kernel=Polynomial(M=M), lambda_=lambda_, epsilon=5)
                     pred_svr = svr.fit(X_train, y_train).predict(X_val)
                     svr_mses.append(mean_squared_error(y_val, pred_svr))
                     svr_svs.append(len(svr.support_vectors()))
@@ -350,7 +350,7 @@ if __name__ == "__main__":
 
             # Retrain on full outer train set with best lambda
             final_rr = KernelizedRidgeRegression(kernel=Polynomial(M=M), lambda_=best_rr_lambda)
-            final_svr = SVR(kernel=Polynomial(M=M), lambda_=best_svr_lambda, epsilon=.5)
+            final_svr = SVR(kernel=Polynomial(M=M), lambda_=best_svr_lambda, epsilon=5)
 
             best_rr_mses.append(mean_squared_error(y_test_outer, final_rr.fit(X_train_outer, y_train_outer).predict(X_test_outer)))
             best_svr_mses.append(mean_squared_error(y_test_outer, final_svr.fit(X_train_outer, y_train_outer).predict(X_test_outer)))
@@ -416,7 +416,7 @@ if __name__ == "__main__":
             preds = model.predict(X_test)
             mse_RR_tmp.append(mean_squared_error(y_test, preds))
 
-            fitter = SVR(kernel=RBF(sigma=sigma), lambda_=1, epsilon=.5)
+            fitter = SVR(kernel=RBF(sigma=sigma), lambda_=1, epsilon=5)
             model = fitter.fit(X_train, y_train)
             preds = model.predict(X_test)
             mse_SVR_tmp.append(mean_squared_error(y_test, preds))
@@ -456,7 +456,7 @@ if __name__ == "__main__":
                     rr_mses.append(mean_squared_error(y_val, pred_rr))
 
                     # SVR
-                    svr = SVR(kernel=RBF(sigma=sigma), lambda_=lambda_, epsilon=.5)
+                    svr = SVR(kernel=RBF(sigma=sigma), lambda_=lambda_, epsilon=5)
                     pred_svr = svr.fit(X_train, y_train).predict(X_val)
                     svr_mses.append(mean_squared_error(y_val, pred_svr))
                     svr_svs.append(len(svr.support_vectors()))
@@ -474,7 +474,7 @@ if __name__ == "__main__":
 
             # Train final models with best lambda
             final_rr = KernelizedRidgeRegression(kernel=RBF(sigma=sigma), lambda_=best_rr_lambda)
-            final_svr = SVR(kernel=RBF(sigma=sigma), lambda_=best_svr_lambda, epsilon=.5)
+            final_svr = SVR(kernel=RBF(sigma=sigma), lambda_=best_svr_lambda, epsilon=5)
 
             best_rr_mses.append(mean_squared_error(y_test_outer, final_rr.fit(X_train_outer, y_train_outer).predict(X_test_outer)))
             best_svr_mses.append(mean_squared_error(y_test_outer, final_svr.fit(X_train_outer, y_train_outer).predict(X_test_outer)))
@@ -604,7 +604,7 @@ if __name__ == "__main__":
 
     plt.subplots_adjust(hspace=0.3, wspace=0.3)
     plt.tight_layout(rect=[0, 0, 1, 0.96])
-    #plt.savefig("report/figures/part2.png")
+    plt.savefig("report/figures/part2.png")
     plt.show()
 
 

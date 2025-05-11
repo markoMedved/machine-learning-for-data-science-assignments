@@ -86,6 +86,7 @@ where:
 x = \left[ \alpha_1, \alpha_1^*, \alpha_2, \alpha_2^*, \ldots \right]
 \]
 
+\vspace{10pt}
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{figures/part1.png}
@@ -173,6 +174,8 @@ Ridge Regression & Polynomial & $M=10$, $\lambda=0.001$ \\
 \label{tab:parameters}
 \end{table}
 
+
+
 \newpage
 \section{Part 2}
 \subsection{Results}
@@ -195,8 +198,10 @@ the cross-validation results. Specifically, we calculated the standard
 deviation across folds and divided by \(\sqrt{n}\), where \(n\) is 
 the number of folds.
 
-To get a somewhat sparse SVR solution, we set \(\epsilon = 1.5\).  
-Figure~\ref{fig:part2} shows the results. Numbers above and below the 
+To get a somewhat sparse SVR solution, we set \(\epsilon = 5\).  
+Figure~\ref{fig:part2} shows the results. Note that with an even larger $\epsilon$ 
+the solution could get even more sparse however then the performance started degrading.
+ Note that the numbers above and below the 
 curves indicate the number of support vectors for each configuration.
 
 
@@ -211,18 +216,16 @@ curves indicate the number of support vectors for each configuration.
 
 \newpage
 \subsection{Disscussion}
-The first comparison we can draw from Figure~\ref{fig:part2} (Note that the numbers 
-below and above the curves represent the numbers of support vectors) concerns 
+The first comparison we can draw from Figure~\ref{fig:part2} concerns 
 the choice of kernel. The polynomial kernel tends to overfit quickly
  at higher degrees. For both Ridge Regression and SVR, a degree of 2
-  gives the best performance. Interestingly, in the case of SVR, degree 
-  10 performs better than degrees 8 or 9.  
+  gives the best performance. 
 
 The RBF kernel is also quite sensitive to the \(\sigma\) parameter, 
 especially for Ridge Regression. Very small \(\sigma\) values lead to 
 overfitting and high loss, while values in the range of 1 to 10 yield
  the best results. Larger \(\sigma\) values result in underfitting and 
- poor performance.
+ worse performance.
 
 Overall, all the models with best chosen parameters
  achieve MSE between 26 and 28, so other factors 
@@ -230,14 +233,49 @@ should influence model choice. Ridge Regression benefits from a closed-form
 solution and faster training, making it suitable when training time is 
 critical. SVR, on the other hand, requires more training time due to the
  optimization solver, but inference can be faster and more memory-efficient 
- since it relies only on support vectors.
+ since it relies only on support vectors. For this particular dataset, we pick 
+ the Kernelized Ridge regression as the better option. 
 
-Both kernels achieve similar performance and yield a comparable number 
+Both kernels achieve similar performance (at the best parameters) and yield a comparable number 
 of support vectors at their optimal configurations, so either could be a
- viable choice depending on practical constraints.
+ suitable choice.
 
  \newpage
 \section{Part 3}
+For this part, we used a subset of 1000 images from the UTKFace dataset, which is commonly used 
+for age prediction from facial images. All images were resized to $(128 \times 128)$ pixels. 
+To evaluate our methods, we performed a train-validation-test split in a 60\%-20\%-20\% ratio.
+\\
+
+As a baseline, we used a naive attribute representation where each image is flattened into a 
+raw pixel vector. We applied kernelized ridge regression for learning, since it offers significantly 
+faster training times compared to SVR. For this baseline, we used the standard
+RBF kernel.
+\\
+
+In our improved method, we enhanced the RBF kernel by first extracting Histogram of Oriented Gradients (HOG) features from the images, and then computing the RBF kernel on these feature vectors.
+\\
+
+Hyperparameter tuning for both methods was performed using grid search. Once the optimal parameters were identified, we retrained the models using the combined training and validation sets. For evaluation, we computed the Mean Squared Error (MSE) on the test set and estimated the uncertainty using asymptotic normality.
+\\
+
+The results are shown in Table~\ref{tab:res}. It is evident that the HOG-enhanced representation significantly 
+outperforms the naive raw pixel approach.
+
+
+\vspace{5pt}
+\begin{table}[h!]
+\centering
+\begin{tabular}{lcc}
+Representation         & MSE    & Std. Error \\
+\hline
+Naive attribute representation         & 195.46 & 24.29      \\
+HOG-Enhanced representation  & 137.79 & 24.62      \\
+\end{tabular}
+\vspace{5pt}
+\caption{Comparison of the naive attribute representation with our implementation}
+\label{tab:res}
+\end{table}
 
 
 
