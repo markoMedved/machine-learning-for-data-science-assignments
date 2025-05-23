@@ -50,23 +50,38 @@ Bayesian Inference}
 
 \subsection{Implementation details}
 
-For this part of the assignment we implemented the Poisson GLM with Bayesian 
-inference. Firstly we standardized the data. Next, for 
-our prior distribution of the regression coefficients ($\beta$ - as) we used 
-the Normal distribution with large variance $\alpha = 10$. We chose this prior 
-because then we don't have a real constraint on the bounds of the coefficients and 
-the large variance makes the prior slightly more "uniform" so we don't really assume
-that the coeficients are in a very specific area. To sample from our posterior 
-we used the Markov Chain Monte Carlo (MCMC) method. To ensure robust computation 
-of convergence diagnostics we used 4 independent chains. We sampled 3000 
-samples from each chain with a burn-in period of 1000 samples. 
+For this part of the assignment, we implemented a Poisson
+ Generalized Linear Model (GLM) using Bayesian inference. As
+  a preprocessing step, we standardized all predictor variables.
+   For the prior distribution of 
+  the regression coefficients ($\beta$), we used a normal distribution
+   with zero mean and a large variance ($\alpha = 10$). This
+    choice reflects a weakly informative prior—wide enough to avoid 
+    imposing strong constraints on the coefficients,
+     allowing the data to primarily inform the posterior.
+
+To perform inference, we used the Markov Chain Monte Carlo (MCMC)
+ method to sample from the posterior distribution. To assess 
+ convergence reliably, we ran 4 independent chains. Each chain 
+ generated 1000 posterior samples following a burn-in (warm-up) 
+ phase of 1000 iterations, which were discarded.
 
 \subsection{Relationship between the explanatory and GoalsScored variables}
-To describe the relationship between the features and the target variable we 
-plot the densities of the posteriors of the regression coefficients on Figure~\ref{fig:densities}.
-We can see that with high probability the Score Rate of the home team is the most 
-important feature, contributing obviously positively to the amout of goals scored. 
-On the other hand the 
+To describe the relationship between features and the target variable, 
+we plot the posterior densities of the regression coefficients in
+ Figure~\ref{fig:densities}. The Score Rate of the home team stands 
+ out as the most important feature, showing a clear positive effect
+  on the expected number of goals (through the exponential link).
+   In contrast, the home team’s foul ratio (somewhat unexpectedly) 
+   and concede rate (as expected) have the strongest negative 
+   effects, reducing the predicted goal count. Other coefficients are
+    close to zero, indicating little effect since their multiplicative 
+    impact on the mean is near one after applying the link function. 
+    The intercept was excluded from this visualization for clarity but 
+    shows a similar distribution centered around one.
+
+The similar widths of the coefficient distributions suggest comparable 
+uncertainty across all features.
 
 
 \begin{figure}[h]
@@ -80,24 +95,135 @@ intercept density}
 
 
 \subsection{MCMC diagnostics}
+We use standard MCMC diagnostics to assess convergence.
+ Figure~\ref{fig:trace} shows the trace plots of all 
+ regression coefficients across the 4 chains. The samples 
+ for each parameter appear stable and well-mixed, with no 
+ visible trends, and the chains overlap closely—indicating good convergence.
+
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=1\columnwidth]{figures/trace.png}
-\caption{}
+\caption{Trace plots for each of the regression coefficients for one of the chains}
 \label{fig:trace}
 \end{figure}
 
+In Figure~\ref{fig:autocorr}, we present the autocorrelation 
+plots for all the regression coefficients 
+(only for one chain to save space). The autocorrelations
+ across most coefficients and lags are close to zero, 
+ indicating that the samples are really nicely uncorrelated.
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=1\columnwidth]{figures/autocorr.png}
-\caption{}
+\caption{Autocorrelation plots for one chain}
 \label{fig:autocorr}
 \end{figure}
 
+In Table~\ref{tab:ess_rhat}, we report the ESS and R-hat statistics 
+for all regression coefficients. The ESS values are consistently high, 
+suggesting efficient sampling. In fact, for some coefficients, the 
+ESS exceeds the total number of samples due to the presence of 
+negative autocorrelation, which can reduce variance in the sample mean. 
+Additionally, all R-hat values are equal to 1.00, indicating that the
+ between-chain and within-chain variances are nearly identical, 
+ confirming good convergence of the Markov chains.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{l|c|c}
+\textbf{Regression coefficients} & \textbf{ESS} & \textbf{R-hat} \\
+\hline
+Intercept        & 6551 & 1.00 \\
+X\_ScoreRateH    & 5878 & 1.00 \\
+X\_ScoreRateA    & 6180 & 1.00 \\
+X\_ConcedeRateH  & 6050 & 1.00 \\
+X\_ConcedeRateA  & 6963 & 1.00 \\
+X\_CornerRatioH  & 6529 & 1.00 \\
+X\_CornerRatioA  & 6416 & 1.00 \\
+X\_FoulRatioH    & 6123 & 1.00 \\
+X\_FoulRatioA    & 6782 & 1.00 \\
+\end{tabular}
+\caption{ESS and R-hat diagnostics for regression coefficients}
+\label{tab:ess_rhat}
+\end{table}
 
 
+\section{Laplace approximation}
+\subsection{Implementation}
+To implement the Laplace approximation, we 
+first derive the negative log-posterior, its gradient,
+ and Hessian with respect to the regression coefficients
+  \(\boldsymbol{\beta}\). Note that since we are using a minimizer, we provide
+  their negative counterparts.
+
+Negative log-posterior: 
+\begin{align}
+-\log p(\boldsymbol{\beta} \mid \mathbf{X}, \mathbf{y}) 
+= - \left( \mathbf{y}^\top \mathbf{X}\boldsymbol{\beta} - \mathbf{1}^\top \exp(\mathbf{X}\boldsymbol{\beta}) - \frac{1}{2\alpha} \boldsymbol{\beta}^\top \boldsymbol{\beta} \right)
+\end{align}
+
+\noindent where \(\alpha\) is the prior variance parameter for a Gaussian prior \(\boldsymbol{\beta} \sim \mathcal{N}(\mathbf{0}, \alpha \mathbf{I})\).
+
+\vspace{1em}
+
+\noindent The gradient of the negative log-posterior is
+\begin{align}
+\nabla_{\boldsymbol{\beta}} \left( -\log p(\boldsymbol{\beta} \mid \mathbf{X}, \mathbf{y}) \right) 
+&= - \left( \mathbf{X}^\top \mathbf{y} - \mathbf{X}^\top \exp(\mathbf{X}\boldsymbol{\beta}) - \frac{1}{\alpha} \boldsymbol{\beta} \right)
+\end{align}
+
+\noindent The Hessian matrix is given by
+\[
+\mathbf{H} = \mathbf{X}^\top \operatorname{diag}\left(\exp(\mathbf{X}\boldsymbol{\beta})\right) \mathbf{X} + \frac{1}{\alpha} \mathbf{I}
+\]
+
+\vspace{1em}
+
+These expressions are used to find the mode of the posterior
+ and approximate it with a Gaussian distribution centered at 
+ the mode with covariance \(\mathbf{H}^{-1}\).
+
+\subsection{Comparison with MCMC}
+To compare the Laplace approximation with the MCMC results, we plot
+ the marginal distributions obtained from the approximation in 
+ Figure~\ref{fig:approx}. These densities closely resemble those 
+ from the MCMC sampling, demonstrating that the Laplace method 
+ captures the posterior distributions well. However, unlike the
+  MCMC samples, the approximated distributions are obviously exact Normal
+   distributions.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=1\columnwidth]{figures/approximation.png}
+\caption{}
+\label{fig:approx}
+\end{figure}
+
+\subsection{Predictions for test cases}
+Lastly, we use our model to make predictions on the test dataset. To 
+obtain the predictive distributions, we first draw 1000 samples from the
+ multivariate normal distribution defined by the estimated regression 
+ coefficients’ means and the covariance matrix (the inverse of the Hessian
+ at the calculated means of $\beta$-s). For each sample of coefficients, 
+ we multiply by the feature vectors and apply the Poisson GLM’s link 
+ function (exponential) to generate the corresponding predicted counts.
+
+For point predictions, we consider three loss functions and select the summary statistic of the predictive distribution accordingly:
+\begin{itemize}
+    \item \textbf{Squared error loss:} use the mean
+    \item \textbf{Absolute error loss:} use the median
+    \item \textbf{Accuracy:} use the mode
+\end{itemize}
+
+Since we do not posses the actual target variables for test cases, we 
+don't compute the metrics. 
+
+
+
+\section{Appendix}
 
 
 

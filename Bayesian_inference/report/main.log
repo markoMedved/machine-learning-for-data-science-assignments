@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.3.6)  22 MAY 2025 21:03
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.3.6)  23 MAY 2025 12:08
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1082,63 +1082,59 @@ Package gensymb Info: Using text companion symbols for \degree, \celsius and \pe
 LaTeX Info: Redefining \ohm on input line 45.
 Package gensymb Info: Using \textohm for \ohm on input line 45.
 Package gensymb Info: Using \textmu for \micro on input line 45.
-LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 55.
+LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 57.
  (C:\Users\marko\AppData\Local\Programs\MiKTeX\tex/latex/lm\ot1lmr.fd
 File: ot1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OML+lmm on input line 55.
+LaTeX Font Info:    Trying to load font information for OML+lmm on input line 57.
  (C:\Users\marko\AppData\Local\Programs\MiKTeX\tex/latex/lm\omllmm.fd
 File: omllmm.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 55.
+LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 57.
  (C:\Users\marko\AppData\Local\Programs\MiKTeX\tex/latex/lm\omslmsy.fd
 File: omslmsy.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 55.
+LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 57.
  (C:\Users\marko\AppData\Local\Programs\MiKTeX\tex/latex/lm\omxlmex.fd
 File: omxlmex.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <9> on input line 55.
+(Font)              <9> on input line 57.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 55.
+(Font)              <6> on input line 57.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 55.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 55.
+(Font)              <5> on input line 57.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 57.
  (C:\Users\marko\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 55.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 57.
  (C:\Users\marko\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 55.
+LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 57.
  (C:\Users\marko\AppData\Local\Programs\MiKTeX\tex/latex/lm\ts1lmr.fd
 File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-<figures/densities.png, id=20, 722.7pt x 433.62pt>
+<figures/densities.png, id=40, 722.7pt x 433.62pt>
 File: figures/densities.png Graphic file (type png)
 <use figures/densities.png>
-Package pdftex.def Info: figures/densities.png  used on input line 74.
+Package pdftex.def Info: figures/densities.png  used on input line 89.
 (pdftex.def)             Requested size: 252.0pt x 151.20026pt.
-<figures/trace.png, id=22, 722.7pt x 1300.86pt>
+<figures/trace.png, id=43, 722.7pt x 1300.86pt>
 File: figures/trace.png Graphic file (type png)
 <use figures/trace.png>
-Package pdftex.def Info: figures/trace.png  used on input line 86.
+Package pdftex.def Info: figures/trace.png  used on input line 107.
 (pdftex.def)             Requested size: 252.0pt x 453.60077pt.
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-<figures/autocorr.png, id=23, 1595.7216pt x 1196.0685pt>
+<figures/autocorr.png, id=45, 1595.7216pt x 1196.0685pt>
 File: figures/autocorr.png Graphic file (type png)
 <use figures/autocorr.png>
-Package pdftex.def Info: figures/autocorr.png  used on input line 94.
+Package pdftex.def Info: figures/autocorr.png  used on input line 120.
 (pdftex.def)             Requested size: 252.0pt x 188.87454pt.
+
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-No file main.bbl.
 [1{C:/Users/marko/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ec.enc}
 
 
@@ -1146,39 +1142,57 @@ No file main.bbl.
 pdfTeX warning (ext4): destination with the same identifier (name{figure.1}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.107 \end{document}
-                    
+l.133 
+      
 pdfTeX warning (ext4): destination with the same identifier (name{figure.2}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.107 \end{document}
-                     <./figures/densities.png> <./figures/trace.png>] [2
+l.133 
+       <./figures/densities.png> <./figures/trace.png>]
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <8> on input line 136.
+<figures/approximation.png, id=68, 722.7pt x 433.62pt>
+File: figures/approximation.png Graphic file (type png)
+<use figures/approximation.png>
+Package pdftex.def Info: figures/approximation.png  used on input line 200.
+(pdftex.def)             Requested size: 252.0pt x 151.20026pt.
+
+No file main.bbl.
+[2
 pdfTeX warning (ext4): destination with the same identifier (name{figure.3}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.107 \end{document}
+l.233 \end{document}
                     
-
- <./figures/autocorr.png>] (main.aux)
+pdfTeX warning (ext4): destination with the same identifier (name{table.1}) has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.233 \end{document}
+                    {C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathsy.enc}{C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathex.enc}
+pdfTeX warning (ext4): destination with the same identifier (name{figure.4}) has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.233 \end{document}
+                     <./figures/autocorr.png> <./figures/approximation.png>] (main.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-04>
  ***********
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 17361704FDDD240FD4E0098F7FBF8E8B;1105.
+(rerunfilecheck)             Checksum: 32D842C66D7199431D4453B09F5F95AB;1825.
  ) 
 Here is how much of TeX's memory you used:
- 14916 strings out of 474486
- 239099 string characters out of 5743756
- 1935542 words of memory out of 5000000
- 36922 multiletter control sequences out of 15000+600000
- 725570 words of font info for 129 fonts, out of 8000000 for 9000
+ 14986 strings out of 474486
+ 240207 string characters out of 5743756
+ 1942542 words of memory out of 5000000
+ 36967 multiletter control sequences out of 15000+600000
+ 744646 words of font info for 148 fonts, out of 8000000 for 9000
  1145 hyphenation exceptions out of 8191
- 63i,6n,67p,641b,456s stack positions out of 10000i,1000n,20000p,200000b,200000s
-<C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmcsc10.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi9.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr10.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr17.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr7.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr8.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr9.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmri9.pfb>
-Output written on main.pdf (2 pages, 654096 bytes).
+ 63i,13n,67p,641b,458s stack positions out of 10000i,1000n,20000p,200000b,200000s
+<C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmbx8.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmbx9.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmcsc10.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmex10.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi9.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmib10.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmib7.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr10.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr17.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr6.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr7.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr8.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr9.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmri9.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy6.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy9.pfb>
+Output written on main.pdf (2 pages, 1595336 bytes).
 PDF statistics:
- 91 PDF objects out of 1000 (max. 8388607)
- 10 named destinations out of 1000 (max. 500000)
- 48 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 168 PDF objects out of 1000 (max. 8388607)
+ 19 named destinations out of 1000 (max. 500000)
+ 93 words of extra memory for PDF output out of 10000 (max. 10000000)
 
