@@ -370,6 +370,12 @@ INPUT .\figures\approximation.png
 INPUT .\figures\approximation.png
 INPUT C:\Users\marko\AppData\Local\Programs\MiKTeX\fonts\enc\dvips\lm\lm-mathsy.enc
 INPUT C:\Users\marko\AppData\Local\Programs\MiKTeX\fonts\enc\dvips\lm\lm-mathex.enc
+INPUT .\figures\derivation.pdf
+INPUT .\figures\derivation.pdf
+INPUT .\figures\derivation.pdf
+INPUT .\figures\derivation.pdf
+INPUT .\figures\derivation.pdf
+INPUT .\figures\derivation.pdf
 INPUT main.aux
 INPUT .\main.out
 INPUT .\main.out
