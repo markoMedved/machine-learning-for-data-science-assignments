@@ -63,15 +63,15 @@ For this part of the assignment, we implemented a Poisson
 To perform inference, we used the Markov Chain Monte Carlo (MCMC)
  method to sample from the posterior distribution. To assess 
  convergence reliably, we ran 4 independent chains. Each chain 
- generated 1000 posterior samples following a burn-in (warm-up) 
- phase of 1000 iterations, which were discarded.
+ generated 1000 posterior samples following a burn-in phase of 1000
+  iterations, which were discarded.
 
 \subsection{Relationship between the explanatory and GoalsScored variables}
 To describe the relationship between features and the target variable, 
 we plot the posterior densities of the regression coefficients in
  Figure~\ref{fig:densities}. The Score Rate of the home team stands 
  out as the most important feature, showing a clear positive effect
-  on the expected number of goals (through the exponential link).
+  on the expected number of goals.
    In contrast, the home team’s foul ratio (somewhat unexpectedly) 
    and concede rate (as expected) have the strongest negative 
    effects, reducing the predicted goal count. Other coefficients are
@@ -81,7 +81,8 @@ we plot the posterior densities of the regression coefficients in
     shows a similar distribution centered around one.
 
 The similar widths of the coefficient distributions suggest comparable 
-uncertainty across all features.
+uncertainty across all features. This is also confirmed when looking at the 
+standard deviations which are roughly the same for all coefficients. 
 
 
 \begin{figure}[h]
@@ -112,8 +113,8 @@ We use standard MCMC diagnostics to assess convergence.
 In Figure~\ref{fig:autocorr}, we present the autocorrelation 
 plots for all the regression coefficients 
 (only for one chain to save space). The autocorrelations
- across most coefficients and lags are close to zero, 
- indicating that the samples are really nicely uncorrelated.
+ across  coefficients and lags are close to zero, with some of them even being
+ negative, indicating that the samples are really nicely uncorrelated.
 
 \begin{figure}[h]
 \centering
@@ -156,7 +157,8 @@ X\_FoulRatioA    & 6782 & 1.00 \\
 To implement the Laplace approximation, we 
 first derive the negative log-posterior, its gradient,
  and Hessian with respect to the regression coefficients
-  \(\boldsymbol{\beta}\). Note that since we are using a minimizer, we provide
+  \(\boldsymbol{\beta}\) (See appendix for the derivation).
+   Note that since we are using a minimizer, we provide
   their negative counterparts.
 
 Negative log-posterior: 
@@ -203,23 +205,26 @@ To compare the Laplace approximation with the MCMC results, we plot
 \end{figure}
 
 \subsection{Predictions for test cases}
-Lastly, we use our model to make predictions on the test dataset. To 
-obtain the predictive distributions, we first draw 1000 samples from the
- multivariate normal distribution defined by the estimated regression 
- coefficients’ means and the covariance matrix (the inverse of the Hessian
- at the calculated means of $\beta$-s). For each sample of coefficients, 
- we multiply by the feature vectors and apply the Poisson GLM’s link 
- function (exponential) to generate the corresponding predicted counts.
+Lastly, we use our model to make predictions on the test dataset. 
+To obtain the predictive distributions, we first draw 1000 samples from the
+ multivariate normal distribution defined by the estimated posterior mean of 
+ the regression coefficients and the corresponding covariance matrix (the inverse
+  of the Hessian evaluated at the posterior mode of $\boldsymbol{\beta}$). For
+   each sampled coefficient vector, we compute the linear predictor, apply the 
+   exponential link function of the Poisson GLM to obtain $\lambda-s$, and then draw
+    1000 samples from the Poisson distribution for each $\lambda$ to get
+     the predictive distribution.
 
-For point predictions, we consider three loss functions and select the summary statistic of the predictive distribution accordingly:
+For point predictions, we match the summary statistic to the corresponding loss function:
 \begin{itemize}
-    \item \textbf{Squared error loss:} use the mean
-    \item \textbf{Absolute error loss:} use the median
-    \item \textbf{Accuracy:} use the mode
+    \item \textbf{Squared error loss:} use the predictive mean
+    \item \textbf{Absolute error loss:} use the predictive median
+    \item \textbf{Accuracy:} use the predictive mode
 \end{itemize}
 
-Since we do not posses the actual target variables for test cases, we 
-don't compute the metrics. 
+Since the actual target values for the test set are unavailable,
+ we couldn't compute the prediction metrics.
+
 
 
 \newpage
