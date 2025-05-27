@@ -64,7 +64,7 @@ To perform inference, we used the Markov Chain Monte Carlo (MCMC)
  method to sample from the posterior distribution. To assess 
  convergence reliably, we ran 4 independent chains. Each chain 
  generated 1000 posterior samples following a burn-in phase of 1000
-  iterations, which were discarded.
+  iterations.
 
 \subsection{Relationship between the explanatory and GoalsScored variables}
 To describe the relationship between features and the target variable, 
@@ -157,7 +157,7 @@ X\_FoulRatioA    & 6782 & 1.00 \\
 To implement the Laplace approximation, we 
 first derive the negative log-posterior, its gradient,
  and Hessian with respect to the regression coefficients
-  \(\boldsymbol{\beta}\) (See appendix for the derivation).
+  \(\boldsymbol{\beta}\) (See Appendix for the derivation).
    Note that since we are using a minimizer, we provide
   their negative counterparts.
 
@@ -215,11 +215,11 @@ To obtain the predictive distributions, we first draw 1000 samples from the
     1000 samples from the Poisson distribution for each $\lambda$ to get
      the predictive distribution.
 
-For point predictions, we match the summary statistic to the corresponding loss function:
+For point predictions, we match the summary statistic of the predictive distribution to the corresponding loss function:
 \begin{itemize}
-    \item \textbf{Squared error loss:} use the predictive mean
-    \item \textbf{Absolute error loss:} use the predictive median
-    \item \textbf{Accuracy:} use the predictive mode
+    \item \textbf{Squared error loss:} use the  mean
+    \item \textbf{Absolute error loss:} use the median
+    \item \textbf{Accuracy:} use the mode and round the results
 \end{itemize}
 
 Since the actual target values for the test set are unavailable,
