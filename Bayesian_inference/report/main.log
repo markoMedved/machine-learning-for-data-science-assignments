@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.3.6)  27 MAY 2025 16:04
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.3.6)  30 MAY 2025 18:16
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1121,11 +1121,11 @@ File: figures/densities.png Graphic file (type png)
 <use figures/densities.png>
 Package pdftex.def Info: figures/densities.png  used on input line 90.
 (pdftex.def)             Requested size: 252.0pt x 151.20026pt.
-<figures/trace.png, id=43, 722.7pt x 1300.86pt>
+<figures/trace.png, id=43, 722.7pt x 1105.731pt>
 File: figures/trace.png Graphic file (type png)
 <use figures/trace.png>
 Package pdftex.def Info: figures/trace.png  used on input line 108.
-(pdftex.def)             Requested size: 252.0pt x 453.60077pt.
+(pdftex.def)             Requested size: 252.0pt x 385.56065pt.
 <figures/autocorr.png, id=45, 1595.7216pt x 1196.0685pt>
 File: figures/autocorr.png Graphic file (type png)
 <use figures/autocorr.png>
@@ -1151,34 +1151,44 @@ l.134
        <./figures/densities.png> <./figures/trace.png>]
 LaTeX Font Info:    External font `lmex10' loaded for size
 (Font)              <8> on input line 137.
-<figures/approximation.png, id=67, 722.7pt x 433.62pt>
+<figures/approximation.png, id=68, 722.7pt x 433.62pt>
 File: figures/approximation.png Graphic file (type png)
 <use figures/approximation.png>
-Package pdftex.def Info: figures/approximation.png  used on input line 202.
+Package pdftex.def Info: figures/approximation.png  used on input line 199.
 (pdftex.def)             Requested size: 252.0pt x 151.20026pt.
+<figures/distr.png, id=70, 722.7pt x 578.16pt>
+File: figures/distr.png Graphic file (type png)
+<use figures/distr.png>
+Package pdftex.def Info: figures/distr.png  used on input line 226.
+(pdftex.def)             Requested size: 226.79846pt x 181.43324pt.
  [2
 pdfTeX warning (ext4): destination with the same identifier (name{figure.3}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.230 \newpage
+l.233 \newpage
               
 pdfTeX warning (ext4): destination with the same identifier (name{table.1}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.230 \newpage
+l.233 \newpage
               {C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathsy.enc}{C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathex.enc}
 pdfTeX warning (ext4): destination with the same identifier (name{figure.4}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.230 \newpage
-               <./figures/autocorr.png> <./figures/approximation.png>]
-<figures/derivation.pdf, id=87, 596.95016pt x 826.7688pt>
+l.233 \newpage
+              
+pdfTeX warning (ext4): destination with the same identifier (name{figure.5}) has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.233 \newpage
+               <./figures/autocorr.png> <./figures/approximation.png> <./figures/distr.png>]
+<figures/derivation.pdf, id=91, 596.95016pt x 826.7688pt>
 File: figures/derivation.pdf Graphic file (type pdf)
 <use figures/derivation.pdf>
-Package pdftex.def Info: figures/derivation.pdf  used on input line 234.
+Package pdftex.def Info: figures/derivation.pdf  used on input line 237.
 (pdftex.def)             Requested size: 441.0pt x 610.7901pt.
 
-Overfull \hbox (189.0pt too wide) in paragraph at lines 234--236
+Overfull \hbox (189.0pt too wide) in paragraph at lines 237--239
  [][] 
  []
 
@@ -1194,17 +1204,17 @@ Package rerunfilecheck Info: File `main.out' has not changed.
 (rerunfilecheck)             Checksum: 32D842C66D7199431D4453B09F5F95AB;1825.
  ) 
 Here is how much of TeX's memory you used:
- 14995 strings out of 474486
- 240448 string characters out of 5743756
- 1944542 words of memory out of 5000000
- 36975 multiletter control sequences out of 15000+600000
+ 15004 strings out of 474486
+ 240634 string characters out of 5743756
+ 1943542 words of memory out of 5000000
+ 36983 multiletter control sequences out of 15000+600000
  744646 words of font info for 148 fonts, out of 8000000 for 9000
  1145 hyphenation exceptions out of 8191
  63i,13n,67p,641b,458s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmbx8.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmbx9.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmcsc10.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmex10.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi9.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmib10.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmib7.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr10.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr17.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr6.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr7.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr8.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr9.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmri9.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy6.pfb><C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy9.pfb>
-Output written on main.pdf (3 pages, 2662856 bytes).
+Output written on main.pdf (3 pages, 2558405 bytes).
 PDF statistics:
- 176 PDF objects out of 1000 (max. 8388607)
- 20 named destinations out of 1000 (max. 500000)
- 98 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 180 PDF objects out of 1000 (max. 8388607)
+ 21 named destinations out of 1000 (max. 500000)
+ 103 words of extra memory for PDF output out of 10000 (max. 10000000)
 

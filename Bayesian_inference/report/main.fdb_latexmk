@@ -1,5 +1,5 @@
 # Fdb version 4
-["bibtex main"] 0 "main.aux" "main.bbl" "main" 1748354695.50835 0
+["bibtex main"] 0 "main.aux" "main.bbl" "main" 1748621804.86455 0
   "C:/Users/marko/AppData/Local/Programs/MiKTeX/bibtex/bst/ieeetran/IEEEtran.bst" 1440622569 57748 7c8250ecf02814ce6ddc0cdbb63df1dd ""
   "bibliography.bib" 0 -1 0 ""
   "main.aux" 0 -1 0 "pdflatex"
@@ -7,7 +7,7 @@
   "main.bbl"
   "main.blg"
   (rewritten before read)
-["pdflatex"] 1748354692.89556 "c:/Users/marko/Desktop/MLDS/machine-learning-for-data-science-assignments/Bayesian_inference/report/main.tex" "main.pdf" "main" 1748354695.50897 0
+["pdflatex"] 1748621802.46223 "c:/Users/marko/Desktop/MLDS/machine-learning-for-data-science-assignments/Bayesian_inference/report/main.tex" "main.pdf" "main" 1748621804.86524 0
   "C:/Users/marko/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1744726569 82507 a9eef8696c92627b87e9975edea03b2a ""
   "C:/Users/marko/AppData/Local/MiKTeX/miktex/data/le/pdftex/pdflatex.fmt" 1741285665 24225045 9df87bb9afcf68668f63d57d7a3d7d4c ""
   "C:/Users/marko/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ec.enc" 1256929440 2375 baa924870cfb487815765f9094cf3728 ""
@@ -181,16 +181,17 @@
   "C:/Users/marko/AppData/Local/Programs/MiKTeX/tex/latex/ucs/utf8x.def" 1700127473 8944 e3433baec74c4b7b278c6b6a547ff9ec ""
   "C:/Users/marko/AppData/Local/Programs/MiKTeX/tex/latex/url/url.sty" 1388490452 12796 8edb7d69a20b857904dd0ea757c14ec9 ""
   "C:/Users/marko/AppData/Local/Programs/MiKTeX/tex/latex/xcolor/xcolor.sty" 1700127522 55487 80a65caedd3722f4c20a14a69e785d8f ""
-  "c:/Users/marko/Desktop/MLDS/machine-learning-for-data-science-assignments/Bayesian_inference/report/main.tex" 1748354692 8890 507be81a29e987142b7f9192fb2d05e2 ""
-  "figures/approximation.png" 1748354601 124649 eadfc24ac6ef05c8c570797fe33c64e9 ""
-  "figures/autocorr.png" 1748354599 86380 3a6f712bbfd7955e7caf57048295aa61 ""
-  "figures/densities.png" 1748354595 114890 0a03af98d622029578ae513dc3bb54b2 ""
+  "c:/Users/marko/Desktop/MLDS/machine-learning-for-data-science-assignments/Bayesian_inference/report/main.tex" 1748621799 8988 45c3d45f13890e659c77d0258dac9e83 ""
+  "figures/approximation.png" 1748620828 124649 eadfc24ac6ef05c8c570797fe33c64e9 ""
+  "figures/autocorr.png" 1748620827 86401 b38232667adddc19c388bed1b5f9f3a7 ""
+  "figures/densities.png" 1748620824 115369 61e08c2100c1d385f6bb88a5719d1ef6 ""
   "figures/derivation.pdf" 1747996645 1040462 08c35c5c3ab19a627b75731257f4f51b ""
-  "figures/trace.png" 1748354597 908185 088a2436d168c63c46dcb49a5a8759fd ""
-  "main.aux" 1748354694 2999 705ee812bb666a0c4a5cd120d676ee87 "pdflatex"
+  "figures/distr.png" 1748621554 56557 69ffc6d1154c4f6494a258eefd7ae6b9 ""
+  "figures/trace.png" 1748621503 834586 91b47bc7beb30266e8d750956ef744ef ""
+  "main.aux" 1748621804 3251 0087ada2bec9ca97e79d4ead810d43d6 "pdflatex"
   "main.bbl" 0 -1 0 "bibtex main"
-  "main.out" 1748354694 1825 32d842c66d7199431d4453b09f5f95ab "pdflatex"
-  "main.tex" 1748354692 8890 507be81a29e987142b7f9192fb2d05e2 ""
+  "main.out" 1748621804 1825 32d842c66d7199431d4453b09f5f95ab "pdflatex"
+  "main.tex" 1748621799 8988 45c3d45f13890e659c77d0258dac9e83 ""
   (generated)
   "main.aux"
   "main.log"

@@ -150,16 +150,16 @@ X\_FoulRatioA    & 6782 & 1.00 \\
 \caption{ESS and R-hat diagnostics for regression coefficients}
 \label{tab:ess_rhat}
 \end{table}
-
+\vspace{-20pt}
 
 \section{Laplace approximation}
 \subsection{Implementation}
 To implement the Laplace approximation, we 
 first derive the negative log-posterior, its gradient,
  and Hessian with respect to the regression coefficients
-  \(\boldsymbol{\beta}\) (See Appendix for the derivation).
-   Note that since we are using a minimizer, we provide
-  their negative counterparts.
+  \(\boldsymbol{\beta}\) (See Appendix for derivation).
+   Since we used a minimizer, we provide
+  the negated versions.
 
 Negative log-posterior: 
 \begin{align}
@@ -168,8 +168,6 @@ Negative log-posterior:
 \end{align}
 
 \noindent where \(\alpha\) is the prior variance parameter for a Gaussian prior \(\boldsymbol{\beta} \sim \mathcal{N}(\mathbf{0}, \alpha \mathbf{I})\).
-
-\vspace{1em}
 
 \noindent The gradient of the negative log-posterior is
 \begin{align}
@@ -182,7 +180,6 @@ Negative log-posterior:
 \mathbf{H} = \mathbf{X}^\top \operatorname{diag}\left(\exp(\mathbf{X}\boldsymbol{\beta})\right) \mathbf{X} + \frac{1}{\alpha} \mathbf{I}
 \]
 
-\vspace{1em}
 
 These expressions are used to find the mode of the posterior
  and approximate it with a Gaussian distribution centered at 
@@ -222,8 +219,14 @@ For point predictions, we match the summary statistic of the predictive distribu
     \item \textbf{Accuracy:} use the mode 
 \end{itemize}
 
-Since the actual target values for the test set are unavailable,
- we couldn't compute the prediction metrics.
+We can see the prediction distributions on Figure~\ref{fig:distr}.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\columnwidth]{figures/distr.png}
+\caption{Distributions of predictions for different losses}
+\label{fig:distr}
+\end{figure}
 
 
 
